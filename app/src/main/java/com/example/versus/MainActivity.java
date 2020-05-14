@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                categoryList.add(new VersusCategory("New Item"));
+                categoryList.add(new VersusCategory("New Item" + categoryList.size()));
                 categoryAdapter.notifyDataSetChanged();
             }
         });
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         categoryAdapter.setOnItemClickListener(new categoryAdapter.OnItemClickListener() {
             @Override
             public void onCategoryClick(int position) {
-                openCategory(position);
+                openCategory(categoryList.get(position).getCategoryName());
             }
 
             @Override
@@ -71,8 +71,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void openCategory(int position) {
-        Intent intent = new Intent(this, ItemActivity.class);
+    private void openCategory(String category_Name) {
+        Intent intent = new Intent(this, CategoryActivity.class);
+        intent.putExtra("category_Name", category_Name);
+
         startActivity(intent);
     }
 }
