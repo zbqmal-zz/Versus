@@ -1,10 +1,10 @@
 package com.example.versus;
 
-public class VersusItem {
+public class VersusCategory {
 
     private String category_Name;
 
-    public VersusItem(String name) {
+    public VersusCategory(String name) {
         category_Name = name;
     }
 

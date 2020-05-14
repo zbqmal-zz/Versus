@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,10 +13,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<VersusItem> itemList;
+    private ArrayList<VersusCategory> categoryList;
 
     private RecyclerView itemRecyclerView;
-    private itemAdapter itemAdapter;
+    private categoryAdapter categoryAdapter;
     private RecyclerView.LayoutManager itemLayoutManager;
 
     private Button buttonAdd;
@@ -37,31 +38,41 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                itemList.add(new VersusItem("New Item"));
-                itemAdapter.notifyDataSetChanged();
+                categoryList.add(new VersusCategory("New Item"));
+                categoryAdapter.notifyDataSetChanged();
             }
         });
     }
 
     public void createItemList() {
-        itemList = new ArrayList<VersusItem>();
+        categoryList = new ArrayList<>();
     }
 
     public void buildRecyclerView() {
-        itemRecyclerView = findViewById(R.id.itemView);
+        itemRecyclerView = findViewById(R.id.categoryView);
         itemRecyclerView.setHasFixedSize(true);
         itemLayoutManager = new LinearLayoutManager(this);
-        itemAdapter = new itemAdapter(itemList);
+        categoryAdapter = new categoryAdapter(categoryList);
 
         itemRecyclerView.setLayoutManager(itemLayoutManager);
-        itemRecyclerView.setAdapter(itemAdapter);
+        itemRecyclerView.setAdapter(categoryAdapter);
 
-        itemAdapter.setOnItemClickListener(new itemAdapter.OnItemClickListener() {
+        categoryAdapter.setOnItemClickListener(new categoryAdapter.OnItemClickListener() {
+            @Override
+            public void onCategoryClick(int position) {
+                openCategory(position);
+            }
+
             @Override
             public void onDeleteClick(int position) {
-                itemList.remove(position);
-                itemAdapter.notifyItemRemoved(position);
+                categoryList.remove(position);
+                categoryAdapter.notifyItemRemoved(position);
             }
         });
+    }
+
+    private void openCategory(int position) {
+        Intent intent = new Intent(this, ItemActivity.class);
+        startActivity(intent);
     }
 }
