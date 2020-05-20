@@ -11,4 +11,8 @@ public class VersusCategory {
     public String getCategoryName() {
         return category_Name;
     }
+
+    public void setCategoryName(String name) {
+        category_Name = name;
+    }
 }

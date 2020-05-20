@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
-public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.itemViewHolder> {
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.itemViewHolder> {
 
     private ArrayList<VersusCategory> categoryList;
     private OnItemClickListener mListener;
@@ -17,6 +17,7 @@ public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.itemVi
     public interface OnItemClickListener {
         void onCategoryClick(int position);
         void onDeleteClick(int position);
+        void onEditClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -26,11 +27,12 @@ public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.itemVi
     public static class itemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView categoryTextView;
-        public ImageView categoryDeleteImage;
+        public ImageView categoryEditImage, categoryDeleteImage;
 
         public itemViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             categoryTextView = itemView.findViewById(R.id.categoryTextView);
+            categoryEditImage = itemView.findViewById(R.id.image_Category_Edit);
             categoryDeleteImage = itemView.findViewById(R.id.image_Category_Delete);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +42,18 @@ public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.itemVi
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             listener.onCategoryClick(position);
+                        }
+                    }
+                }
+            });
+
+            categoryEditImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onEditClick(position);
                         }
                     }
                 }
@@ -59,7 +73,7 @@ public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.itemVi
         }
     }
 
-    public categoryAdapter(ArrayList<VersusCategory> itemList) {
+    public CategoryAdapter(ArrayList<VersusCategory> itemList) {
         categoryList = itemList;
     }
 
