@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createItemList();
+        createCategoryList();
         buildRecyclerView();
 
         setButtons();
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void createItemList() {
+    public void createCategoryList() {
         categoryList = new ArrayList<>();
     }
 

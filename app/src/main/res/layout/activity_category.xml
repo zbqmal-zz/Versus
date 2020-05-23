@@ -56,8 +56,16 @@
             android:layout_marginBottom="0dp">
 
             <TableRow
+                android:id="@+id/table_col"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New Item" />
+            </TableRow>
         </HorizontalScrollView>
     </RelativeLayout>
 
@@ -85,24 +93,21 @@
 
 
             <TableLayout
+                android:id="@+id/table_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent">
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New Category" />
+                </TableRow>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
             </TableLayout>
         </ScrollView>
     </RelativeLayout>
@@ -128,6 +133,7 @@
                 android:padding="10px">
 
                 <TableLayout
+                    android:id="@+id/table_items"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -151,5 +157,29 @@
         </HorizontalScrollView>
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_Add_Col"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/ic_add_table"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout2"
+        app:layout_constraintEnd_toEndOf="@+id/relativeLayout2">
+    </ImageView>
+
+    <ImageView
+        android:id="@+id/image_Add_Row"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_add_table"
+        app:layout_constraintStart_toStartOf="@+id/relativeLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3">
+
+    </ImageView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
