@@ -10,4 +10,8 @@ public class VersusItem {
     public String getItemName() {
         return item_Name;
     }
+
+    public void setItemName(String name) {
+        item_Name = name;
+    }
 }
