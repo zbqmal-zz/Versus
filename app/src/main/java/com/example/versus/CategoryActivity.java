@@ -1,8 +1,10 @@
 package com.example.versus;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.text.Layout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -35,6 +38,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     private VerticalScroll itemCategory_Vertical,
                            itemValue_Vertical;
 
+    private TextView init_ItemName, init_ItemValue, init_ItemCategory;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         String category_Name = intent.getStringExtra("category_Name");
         TextView categoryNameTextView = findViewById(R.id.categoryNameTextView);
         categoryNameTextView.setText(category_Name);
+
+        setupInitTextView();
 
         setupScrolling();
         itemName_Horizontal.setScrollViewListener(this);
@@ -75,6 +82,93 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         } else if (scrollView == itemValue_Vertical) {
             itemCategory_Vertical.scrollTo(x, y);
         }
+    }
+
+    private void setupInitTextView() {
+        init_ItemName = findViewById(R.id.textView_Itm);
+        init_ItemValue = findViewById(R.id.textView_Value);
+        init_ItemCategory = findViewById(R.id.textView_Category);
+
+        init_ItemName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                final EditText itemNameEditText = new EditText(CategoryActivity.this);
+
+                dialog.setTitle("New Item Name: \n");
+                dialog.setView(itemNameEditText);
+
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        init_ItemName.setText(itemNameEditText.getText().toString());
+                    }
+                });
+
+                dialog.show();
+            }
+        });
+
+        init_ItemValue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                final EditText itemValueEditText = new EditText(CategoryActivity.this);
+
+                dialog.setTitle("New Item Value: \n");
+                dialog.setView(itemValueEditText);
+
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        init_ItemValue.setText(itemValueEditText.getText().toString());
+                    }
+                });
+
+                dialog.show();
+            }
+        });
+
+        init_ItemCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                final EditText itemCategoryEditText = new EditText(CategoryActivity.this);
+
+                dialog.setTitle("New Item Category: \n");
+                dialog.setView(itemCategoryEditText);
+
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        init_ItemCategory.setText(itemCategoryEditText.getText().toString());
+                    }
+                });
+
+                dialog.show();
+            }
+        });
     }
 
     private void setupScrolling() {
@@ -109,23 +203,75 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             @Override
             public void onClick(View v) {
                 // For item names
-                TextView newItemTextView = new TextView(CategoryActivity.this);
+                final TextView newItemTextView = new TextView(CategoryActivity.this);
                 newItemTextView.setText("New Item");
                 newItemTextView.setGravity(Gravity.CENTER);
                 newItemTextView.setWidth(300);
                 newItemTextView.setHeight(150);
+                newItemTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                        final EditText itemNameEditText = new EditText(CategoryActivity.this);
+
+                        dialog.setTitle("New Item Name: \n");
+                        dialog.setView(itemNameEditText);
+
+                        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                newItemTextView.setText(itemNameEditText.getText().toString());
+                            }
+                        });
+
+                        dialog.show();
+                    }
+                });
                 table_Col.addView(newItemTextView);
                 itemList.add(new VersusItem("New Item"));
 
                 // For item values
                 for (int i = 0; i < categoryList.size(); i++) {
                     // TextView for value
-                    TextView newValueTextView = new TextView(CategoryActivity.this);
+                    final TextView newValueTextView = new TextView(CategoryActivity.this);
                     newValueTextView.setGravity(Gravity.CENTER);
                     newValueTextView.setWidth(300);
                     newValueTextView.setHeight(100);
                     newValueTextView.setBackgroundColor(Color.parseColor("#FFFFFF"));
                     newValueTextView.setText("New Value");
+                    newValueTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                            final EditText itemValueEditText = new EditText(CategoryActivity.this);
+
+                            dialog.setTitle("New Item Value: \n");
+                            dialog.setView(itemValueEditText);
+
+                            dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    newValueTextView.setText(itemValueEditText.getText().toString());
+                                }
+                            });
+
+                            dialog.show();
+                        }
+                    });
 
                     // Add a cell on each row
                     TableRow currTableRow = (TableRow) table_Items.getChildAt(i);
@@ -142,11 +288,37 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 // New table row
                 TableRow newTableRow = new TableRow(CategoryActivity.this);
                 newTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                TextView newTextView = new TextView(CategoryActivity.this);
+                final TextView newTextView = new TextView(CategoryActivity.this);
                 newTextView.setGravity(Gravity.CENTER);
                 newTextView.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
                 newTextView.setHeight(100);
                 newTextView.setText("New Category");
+                newTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                        final EditText itemCategoryEditText = new EditText(CategoryActivity.this);
+
+                        dialog.setTitle("New Item Category: \n");
+                        dialog.setView(itemCategoryEditText);
+
+                        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                newTextView.setText(itemCategoryEditText.getText().toString());
+                            }
+                        });
+
+                        dialog.show();
+                    }
+                });
 
                 // Add the new contents on the row and table
                 newTableRow.addView(newTextView);
@@ -160,12 +332,38 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                 // To add each new value
                 for (int i = 0; i < itemList.size(); i++) {
-                    TextView newValueTextView = new TextView(CategoryActivity.this);
+                    final TextView newValueTextView = new TextView(CategoryActivity.this);
                     newValueTextView.setGravity(Gravity.CENTER);
                     newValueTextView.setWidth(300);
                     newValueTextView.setHeight(100);
                     newValueTextView.setBackgroundColor(Color.parseColor("#FFFFFF"));
                     newValueTextView.setText("New Value");
+                    newValueTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
+                            final EditText itemValueEditText = new EditText(CategoryActivity.this);
+
+                            dialog.setTitle("New Item Value: \n");
+                            dialog.setView(itemValueEditText);
+
+                            dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    newValueTextView.setText(itemValueEditText.getText().toString());
+                                }
+                            });
+
+                            dialog.show();
+                        }
+                    });
                     newValueTableRow.addView(newValueTextView);
                 }
                 table_Items.addView(newValueTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
