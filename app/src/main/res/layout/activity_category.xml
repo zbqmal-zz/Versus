@@ -43,7 +43,8 @@
         app:layout_constraintTop_toBottomOf="@+id/categoryNameTextView"
         app:layout_constraintVertical_bias="0.18">
 
-        <HorizontalScrollView
+        <com.example.versus.HorizontalScroll
+            android:id="@+id/itemName_Horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
@@ -70,7 +71,7 @@
                     android:text="New Item" />
 
             </TableRow>
-        </HorizontalScrollView>
+        </com.example.versus.HorizontalScroll>
     </RelativeLayout>
 
     <RelativeLayout
@@ -83,7 +84,8 @@
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
         app:layout_constraintVertical_bias="0.0">
 
-        <ScrollView
+        <com.example.versus.VerticalScroll
+            android:id="@+id/itemCategory_Vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
@@ -114,7 +116,7 @@
                 </TableRow>
 
             </TableLayout>
-        </ScrollView>
+        </com.example.versus.VerticalScroll>
     </RelativeLayout>
 
     <LinearLayout
@@ -128,11 +130,13 @@
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
         app:layout_constraintVertical_bias="0.1">
 
-        <HorizontalScrollView
+        <com.example.versus.HorizontalScroll
+            android:id="@+id/itemValue_Horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ScrollView
+            <com.example.versus.VerticalScroll
+                android:id="@+id/itemValue_Vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10px">
@@ -152,15 +156,13 @@
                             android:id="@+id/textView_Value"
                             android:layout_width="300px"
                             android:layout_height="100px"
-                            android:layout_marginVertical="1dp"
-                            android:layout_marginHorizontal="1dp"
                             android:background="#ffffff"
                             android:gravity="center"
                             android:text="New Value" />
                     </TableRow>
                 </TableLayout>
-            </ScrollView>
-        </HorizontalScrollView>
+            </com.example.versus.VerticalScroll>
+        </com.example.versus.HorizontalScroll>
 
     </LinearLayout>
 
