@@ -1,6 +1,8 @@
 package com.example.versus;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,8 +18,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CategoryActivity extends AppCompatActivity {
+public class CategoryActivity extends AppCompatActivity implements HorizontalScroll.ScrollViewListener, VerticalScroll.ScrollViewListener {
 
+    private Context context;
     private ImageView btn_AddCol,
                       btn_AddRow;
     private TableLayout table_Row,
@@ -25,6 +28,13 @@ public class CategoryActivity extends AppCompatActivity {
     private TableRow table_Col;
     private ArrayList<VersusItem> itemList;
     private ArrayList<String> categoryList;
+
+    private HorizontalScroll itemName_Horizontal,
+                             itemValue_Horizontal;
+
+    private VerticalScroll itemCategory_Vertical,
+                           itemValue_Vertical;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +47,42 @@ public class CategoryActivity extends AppCompatActivity {
         TextView categoryNameTextView = findViewById(R.id.categoryNameTextView);
         categoryNameTextView.setText(category_Name);
 
+        setupScrolling();
+        itemName_Horizontal.setScrollViewListener(this);
+        itemValue_Horizontal.setScrollViewListener(this);
+        itemValue_Vertical.setScrollViewListener(this);
+        itemCategory_Vertical.setScrollViewListener(this);
+
         createLists();
         setTables();
         setButtons();
+
+    }
+
+    @Override
+    public void onScrollChanged(HorizontalScroll scrollView, int x, int y, int oldx, int oldy) {
+        if (scrollView == itemName_Horizontal) {
+            itemValue_Horizontal.scrollTo(x, y);
+        } else if (scrollView == itemValue_Horizontal) {
+            itemName_Horizontal.scrollTo(x, y);
+        }
+    }
+
+    @Override
+    public void onScrollChanged(VerticalScroll scrollView, int x, int y, int oldx, int oldy) {
+        if (scrollView == itemCategory_Vertical) {
+            itemValue_Vertical.scrollTo(x, y);
+        } else if (scrollView == itemValue_Vertical) {
+            itemCategory_Vertical.scrollTo(x, y);
+        }
+    }
+
+    private void setupScrolling() {
+
+        itemName_Horizontal = findViewById(R.id.itemName_Horizontal);
+        itemValue_Horizontal = findViewById(R.id.itemValue_Horizontal);
+        itemCategory_Vertical = findViewById(R.id.itemCategory_Vertical);
+        itemValue_Vertical = findViewById(R.id.itemValue_Vertical);
 
     }
 
