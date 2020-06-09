@@ -231,6 +231,20 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                             }
                         });
 
+                        dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int indexOfItemName = table_Col.indexOfChild(newItemTextView);
+                                table_Col.removeView(newItemTextView);
+                                itemList.remove(indexOfItemName);
+
+                                for (int i = 0; i < categoryList.size(); i++) {
+                                    TableRow curr_Row = (TableRow) table_Items.getChildAt(i);
+                                    curr_Row.removeView(curr_Row.getChildAt(indexOfItemName));
+                                }
+                            }
+                        });
+
                         dialog.show();
                     }
                 });
@@ -286,7 +300,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 // For table_Row
                 // New table row
-                TableRow newTableRow = new TableRow(CategoryActivity.this);
+                final TableRow newTableRow = new TableRow(CategoryActivity.this);
                 newTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                 final TextView newTextView = new TextView(CategoryActivity.this);
                 newTextView.setGravity(Gravity.CENTER);
@@ -313,6 +327,17 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 newTextView.setText(itemCategoryEditText.getText().toString());
+                            }
+                        });
+
+                        dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int indexOfCategory = table_Row.indexOfChild(newTableRow);
+                                table_Row.removeView(newTableRow);
+                                table_Items.removeView(table_Items.getChildAt(indexOfCategory));
+
+                                categoryList.remove(indexOfCategory);
                             }
                         });
 
