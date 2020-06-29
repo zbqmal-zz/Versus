@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     public void createCategoryList() {
 
         // Initializes new arrayList
-        Cursor data = mDatabaseHelper.getData();
+        Cursor data = mDatabaseHelper.getData("type_table");
         categoryList = new ArrayList<>(data.getCount());
 
         // Instantiate the list from local SQLite database
@@ -86,12 +86,13 @@ public class MainActivity extends AppCompatActivity {
         categoryAdapter.setOnItemClickListener(new CategoryAdapter.OnItemClickListener() {
             @Override
             public void onCategoryClick(int position) {
-                openCategory(categoryList.get(position).getCategoryName());
+                openCategory(categoryList.get(position).getCategoryName(), categoryList.get(position).getCategoryID());
             }
 
             @Override
             public void onEditClick(int position) {
                 final int category_Position = position;
+                final String old_Name = categoryList.get(position).getCategoryName();
 
                 // Dialog for typing new name for the category
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -114,21 +115,51 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String newName = categoryEditText.getText().toString();
 
-//                        // Update category adapter
-//                        category.setCategoryName(newName);
+                        // TODO: When trying to rename with existing name
 
-
-                        // Update categoryList for SQLite
-                        boolean isUpdated = mDatabaseHelper.updateData("type_table", categoryList.get(category_Position).getCategoryID(), newName);
-                        if (isUpdated) {
-                            // Update categoryList and adapter
-                            categoryList.get(category_Position).setCategoryName(newName);
-                            categoryAdapter.notifyDataSetChanged();
-
-                            Toast.makeText(MainActivity.this, "Updated!", Toast.LENGTH_SHORT).show();
+                        if (old_Name == newName) {
+                            dialog.dismiss();
                         } else {
-                            Toast.makeText(MainActivity.this, "ERROR Occurred", Toast.LENGTH_SHORT).show();
+                            // Update categoryList for SQLite
+                            if (categoryList.indexOf(newName) < 0) {
+                                boolean isUpdated = mDatabaseHelper.updateData("type_table", categoryList.get(category_Position).getCategoryID(), "name", newName);
+                                if (isUpdated) {
+                                    // Update categoryList and adapter
+                                    categoryList.get(category_Position).setCategoryName(newName);
+                                    categoryAdapter.notifyDataSetChanged();
+
+                                    // Rename table name
+                                    mDatabaseHelper.renameTable(old_Name, newName);
+
+                                    Toast.makeText(MainActivity.this, "Updated!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "ERROR Occurred", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(MainActivity.this, "SAME NAME FOUND", Toast.LENGTH_SHORT).show();
+                            }
                         }
+
+//                        // TODO: Remove
+//                        System.out.println("======== Type_TABLE =========");
+//                        Cursor test_Data = mDatabaseHelper.getData("type_table");
+//                        while(test_Data.moveToNext()) {
+//                            System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+//                        }
+//                        System.out.println("=============================");
+//
+//                        System.out.println("======== " + newName + " =========");
+//                        Cursor test_Data2 = mDatabaseHelper.getData(newName);
+//                        while(test_Data.moveToNext()) {
+//                            System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
+//                        }
+//                        System.out.println("=============================");
+//
+//                        System.out.println("======== CategoryList =========");
+//                        for (int i = 0; i< categoryList.size(); i++) {
+//                            System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+//                        }
+//                        System.out.println("=============================");
                     }
                 });
 
@@ -139,11 +170,31 @@ public class MainActivity extends AppCompatActivity {
             public void onDeleteClick(int position) {
 
                 // Delete category from the local database
+                String oldName = categoryList.get(position).getCategoryName();
                 int isDeleted = mDatabaseHelper.deleteData("type_table", categoryList.get(position).getCategoryID());
+
+                // Drop the table for items
+                mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName());
 
                 // Delete category from the list and adapter
                 categoryList.remove(position);
                 categoryAdapter.notifyItemRemoved(position);
+
+//                // TODO: Remove
+//                System.out.println("======== Type_TABLE =========");
+//                Cursor test_Data = mDatabaseHelper.getData("type_table");
+//                while(test_Data.moveToNext()) {
+//                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+//                }
+//                System.out.println("mDatabaseHelper.getData(" + oldName + "): " + mDatabaseHelper.getData(oldName));
+//                System.out.println("=============================");
+//
+//                System.out.println("======== CategoryList =========");
+//                for (int i = 0; i< categoryList.size(); i++) {
+//                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+//                }
+//                System.out.println("=============================");
+
             }
         });
     }
@@ -159,29 +210,65 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Add a new category into the SQLite database
-                boolean insertData = mDatabaseHelper.addData("New Item");
-                Cursor data = mDatabaseHelper.getData();
-                data.moveToLast();
+                Cursor data = mDatabaseHelper.getData("type_table");
+                String newItemName;
+                if (data.getCount() == 0) {
+                    newItemName = "New_Item" + 1;
+                } else {
+                    data.moveToLast();
+                    newItemName = "New_Item" + (Integer.parseInt(data.getString(0)) + 1);
+                }
+                System.out.println("newItemName: " + newItemName);
+                boolean insertData = mDatabaseHelper.addData("type_table", newItemName);
+                data = mDatabaseHelper.getData("type_table");
+                data.moveToLast(); // To set new category's id below
 
                 if (insertData) {
                     // Add a new category into categoryList
-                    categoryList.add(new VersusCategory(data.getString(0), "New Item"));
+                    categoryList.add(new VersusCategory(data.getString(0), newItemName));
                     categoryAdapter.notifyDataSetChanged();
+
+                    // Add a table corresponding to the category
+                    mDatabaseHelper.addTable(newItemName);
 
                     Toast.makeText(MainActivity.this, "Added!", Toast.LENGTH_SHORT);
                 } else {
                     Toast.makeText(MainActivity.this, "Error Occurred", Toast.LENGTH_SHORT);
                 }
+
+//                // TODO: Remove
+//                System.out.println("======== Type_TABLE =========");
+//                Cursor test_Data = mDatabaseHelper.getData("type_table");
+//                while(test_Data.moveToNext()) {
+//                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+//                }
+//                System.out.println("=============================");
+//
+//                System.out.println("======== " + newItemName + " =========");
+//                Cursor test_Data2 = mDatabaseHelper.getData(newItemName);
+//                while(test_Data.moveToNext()) {
+//                    System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
+//                }
+//                System.out.println("=============================");
+//
+//                System.out.println("======== CategoryList =========");
+//                for (int i = 0; i< categoryList.size(); i++) {
+//                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+//                }
+//                System.out.println("=============================");
             }
         });
+
+
     }
 
     /*
     Function to move to each category activity
      */
-    private void openCategory(String category_Name) {
+    private void openCategory(String category_Name, String category_ID) {
         Intent intent = new Intent(this, CategoryActivity.class);
         intent.putExtra("category_Name", category_Name);
+        intent.putExtra("category_ID", category_ID);
 
         startActivity(intent);
     }

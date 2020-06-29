@@ -1,5 +1,7 @@
 package com.example.versus;
 
+import java.util.ArrayList;
+
 public class VersusCategory {
 
     private String category_ID;
