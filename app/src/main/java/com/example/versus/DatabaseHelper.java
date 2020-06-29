@@ -135,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for renaming a column
      */
-    public void renameColumn(String table_Name, String column_Name, String newColumn_Name) {
+    public void renameColumn(String table_Name, String old_column_Name, String new_Column_Name) {
 
         // Retrieve the data from old table
         Cursor data = getData(table_Name);
@@ -146,8 +146,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
         data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
-            if (column_Name == data.getString(i)) {
-                createNewTable += (" '" + newColumn_Name + "' TEXT");
+            if (old_column_Name.equals(data.getColumnName(i))) {
+                createNewTable += (" " + new_Column_Name + " TEXT");
             } else {
                 createNewTable += (" " + data.getColumnName(i) + " TEXT");
             }
@@ -168,7 +168,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues contentValues = new ContentValues();
             contentValues.put("ID", Integer.parseInt(data.getString(0)));
             for (int i = 1; i < data.getColumnCount(); i++) {
-                contentValues.put(data.getColumnName(i), data.getString(i));
+                if (old_column_Name.equals(data.getColumnName(i))) {
+                    contentValues.put(new_Column_Name, data.getString(i));
+                } else {
+                    contentValues.put(data.getColumnName(i), data.getString(i));
+                }
             }
 
             // Add each value
