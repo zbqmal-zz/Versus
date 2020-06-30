@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Delete category from the local database
                 String oldName = categoryList.get(position).getCategoryName();
-                int isDeleted = mDatabaseHelper.deleteData("type_table", categoryList.get(position).getCategoryID());
+                mDatabaseHelper.deleteData("type_table", categoryList.get(position).getCategoryID());
 
                 // Drop the table for items
                 mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName());
