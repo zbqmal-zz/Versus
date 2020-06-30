@@ -91,6 +91,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     Method for updating data
      */
     public boolean updateData(String table_Name, String id, String category, String value) {
+        System.out.println("table_Name: " + table_Name + ", id: " + id + ", category: " + category + ", value: " + value);
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("ID", id);
@@ -109,9 +111,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
-    public int deleteData(String table_Name, String id) {
+    public void deleteData(String table_Name, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(table_Name, "ID = ?", new String[] { id });
+        String deleteData = "DELETE FROM " + table_Name + " WHERE ID = " + id;
+        db.execSQL(deleteData);
     }
 
     /*
@@ -128,14 +131,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteTable(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String dropTable = "DROP TABLE IF EXISTS '" + table_Name + "'";
+        String dropTable = "DROP TABLE IF EXISTS " + table_Name;
         db.execSQL(dropTable);
     }
 
     /*
     Method for renaming a column
      */
-    public void renameColumn(String table_Name, String old_column_Name, String new_Column_Name) {
+    public void renameColumn(String table_Name, String old_Column_Name, String new_Column_Name) {
 
         // Retrieve the data from old table
         Cursor data = getData(table_Name);
@@ -146,10 +149,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
         data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
-            if (old_column_Name.equals(data.getColumnName(i))) {
+            System.out.println("old_Column_Name: " + old_Column_Name + ", new_Column_Name: " + new_Column_Name + ", data.getColumnName(" + i + "): " + data.getColumnName(i));
+            if (old_Column_Name.equals(data.getColumnName(i))) {
                 createNewTable += (" " + new_Column_Name + " TEXT");
+                System.out.println("Changed!");
             } else {
                 createNewTable += (" " + data.getColumnName(i) + " TEXT");
+                System.out.println("Not Changed!");
             }
 
             if (i < data.getColumnCount() - 1) {
@@ -168,7 +174,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues contentValues = new ContentValues();
             contentValues.put("ID", Integer.parseInt(data.getString(0)));
             for (int i = 1; i < data.getColumnCount(); i++) {
-                if (old_column_Name.equals(data.getColumnName(i))) {
+                if (old_Column_Name.equals(data.getColumnName(i))) {
                     contentValues.put(new_Column_Name, data.getString(i));
                 } else {
                     contentValues.put(data.getColumnName(i), data.getString(i));
@@ -195,10 +201,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Create new table
         SQLiteDatabase db = this.getWritableDatabase();
-        String tempTableName = "temp_Table";
+        String tempTableName = "temp_table";
         String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
+        data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
-            if (column_Name != data.getString(i)) {
+            if (column_Name.equals(data.getString(i))) {
                 createNewTable += (" " + data.getString(i) + " TEXT");
             }
 
@@ -211,6 +218,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createNewTable);
 
         // Copy and paste old table into new table
+        data = getData(table_Name);
         while (data.moveToNext()) {
 
             // Put each value into contentValues

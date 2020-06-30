@@ -216,11 +216,12 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 mDatabaseHelper.addItemData(category_Name, "New Item", "New Value");
 
                 // 2. into UI
-                Integer newId = data.getCount() + 1;
-                TextView newItemTextView = createTextViewForItemName(newId.toString(), "New Item", table_ItemNames);
+                data.moveToLast();
+                String newId = data.getString(0);
+                TextView newItemTextView = createTextViewForItemName(newId, "New Item", table_ItemNames);
                 table_ItemNames.addView(newItemTextView);
                 for (int i = 2; i < data.getColumnCount(); i++) {
-                    TextView newValueTextView = createTextViewForItemValue(newId.toString(), "New Value", data.getColumnName(i), i - 2);
+                    TextView newValueTextView = createTextViewForItemValue(newId, "New Value", data.getColumnName(i), i - 2);
 
                     // Add a cell on each row
                     TableRow currTableRow = (TableRow) table_Items.getChildAt(i - 2);
@@ -228,7 +229,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
 
                 // 3. into itemList
-                VersusItem newItem = new VersusItem(String.valueOf(data.getCount()), "New Item");
+                VersusItem newItem = new VersusItem(String.valueOf(Integer.parseInt(newId)), "New Item");
                 for (int i = 2; i < data.getColumnCount(); i++) {
                     newItem.getItemValues().add("New Value");
                 }
@@ -274,14 +275,14 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                 // 2. into UI
                 // New Category
-                TableRow newTableRow = createTableRowForItemCategory("New_Category", table_Categories);
+                TableRow newTableRow = createTableRowForItemCategory(newCategoryName, table_Categories);
                 table_Categories.addView(newTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 
                 // New Values
                 TableRow newValueTableRow = new TableRow(CategoryActivity.this);
                 newValueTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                 for (int i = 0; i < itemList.size(); i++) {
-                    TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 1);
+                    TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 2);
                     newValueTableRow.addView(newValueTextView);
                 }
                 table_Items.addView(newValueTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -362,6 +363,29 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                         // Change on UI
                         newItemTextView.setText(newItemName);
+
+                        // TODO: Remove ===========================================
+                        System.out.println("============= item List ==============");
+                        for (int i = 0; i < itemList.size(); i++) {
+                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
+                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
+                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+
+                        System.out.println("============= Database ===============");
+                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
+                        while(test_Data2.moveToNext()) {
+                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
+                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
+                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+                        // TODO: ==================================================
                     }
                 });
 
@@ -375,11 +399,34 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         // Delete itemName from UI
                         int indexOfItemName = tableRow.indexOfChild(newItemTextView);
                         tableRow.removeView(newItemTextView);
-                        itemList.remove(indexOfItemName);
-                        for (int i = 0; i < itemList.size(); i++) {
+                        for (int i = 0; i < itemList.get(0).getItemValueSize(); i++) {
                             TableRow curr_Row = (TableRow) table_Items.getChildAt(i);
                             curr_Row.removeView(curr_Row.getChildAt(indexOfItemName));
                         }
+                        itemList.remove(indexOfItemName);
+
+                        // TODO: Remove ===========================================
+                        System.out.println("============= item List ==============");
+                        for (int i = 0; i < itemList.size(); i++) {
+                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
+                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
+                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+
+                        System.out.println("============= Database ===============");
+                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
+                        while(test_Data2.moveToNext()) {
+                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
+                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
+                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+                        // TODO: ==================================================
                     }
                 });
 
@@ -429,12 +476,13 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         // Change on UI
                         newTextView.setText(newItemCategory);
 
+                        // TODO: Remove
                         System.out.println("============= Database ===============");
                         Cursor test_Data = mDatabaseHelper.getData(category_Name);
                         while(test_Data.moveToNext()) {
                             System.out.print(test_Data.getString(0) + ". " + test_Data.getString(1) + ", ");
                             for (int i = 2; i < test_Data.getColumnCount(); i++) {
-                                System.out.print(test_Data.getColumnName(2) + ": " + test_Data.getString(2) + ", ");
+                                System.out.print(test_Data.getColumnName(i) + ": " + test_Data.getString(i) + ", ");
                             }
                             System.out.println();
                         }
@@ -455,6 +503,29 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         for (int i = 0; i < itemList.size(); i++) {
                             itemList.get(i).getItemValues().remove(indexOfCategory);
                         }
+
+                        // TODO: Remove ===========================================
+                        System.out.println("============= item List ==============");
+                        for (int i = 0; i < itemList.size(); i++) {
+                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
+                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
+                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+
+                        System.out.println("============= Database ===============");
+                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
+                        while(test_Data2.moveToNext()) {
+                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
+                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
+                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+                        // TODO: ==================================================
                     }
                 });
 
@@ -499,7 +570,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         String newItemValue = itemValueEditText.getText().toString();
 
                         // Change on DB
-                        mDatabaseHelper.updateData(category_Name, id, category, newItemValue);
+                        Cursor data = mDatabaseHelper.getData(category_Name);
+                        mDatabaseHelper.updateData(category_Name, id, data.getColumnName(category_Index + 2), newItemValue);
 
                         // Change on itemList
                         for (int i = 0; i < itemList.size(); i++) {
@@ -511,6 +583,29 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                         // Change on UI
                         newItemValueTextView.setText(newItemValue);
+
+                        // TODO: Remove ===========================================
+                        System.out.println("============= item List ==============");
+                        for (int i = 0; i < itemList.size(); i++) {
+                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
+                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
+                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+
+                        System.out.println("============= Database ===============");
+                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
+                        while(test_Data2.moveToNext()) {
+                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
+                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
+                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("======================================");
+                        // TODO: ==================================================
                     }
                 });
 
