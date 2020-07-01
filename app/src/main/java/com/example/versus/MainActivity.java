@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setButtons();
     }
 
-    // Methods ...
+
     /*
     Function to initialize categoryList arrayList
      */
@@ -115,52 +115,76 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String newName = categoryEditText.getText().toString();
 
-                        // TODO: When trying to rename with existing name
-
                         if (old_Name.equals(newName)) {
                             dialog.dismiss();
                         } else {
                             // Update categoryList for SQLite
-                            if (categoryList.indexOf(newName) < 0) {
+                            if (mDatabaseHelper.renameTable(old_Name, newName)) {
+
+                                // Update name in type_table
                                 boolean isUpdated = mDatabaseHelper.updateData("type_table", categoryList.get(category_Position).getCategoryID(), "name", newName);
-                                if (isUpdated) {
+
+                                if(isUpdated) {
                                     // Update categoryList and adapter
                                     categoryList.get(category_Position).setCategoryName(newName);
                                     categoryAdapter.notifyDataSetChanged();
 
-                                    // Rename table name
-                                    mDatabaseHelper.renameTable(old_Name, newName);
+                                    // Rename Count table
                                     mDatabaseHelper.renameTable(old_Name + "_Count", newName + "_Count");
-
-                                    Toast.makeText(MainActivity.this, "Updated!", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(MainActivity.this, "ERROR Occurred", Toast.LENGTH_SHORT).show();
+                                    // If newItemName is duplicate, show fail message
+                                    AlertDialog newDialog = new AlertDialog.Builder(MainActivity.this).create();
+
+                                    newDialog.setTitle("Unknown Error Occurred!");
+
+                                    newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    newDialog.show();
                                 }
+
                             } else {
-                                Toast.makeText(MainActivity.this, "SAME NAME FOUND", Toast.LENGTH_SHORT).show();
+
+                                // If newItemName is duplicate, show fail message
+                                AlertDialog newDialog = new AlertDialog.Builder(MainActivity.this).create();
+
+                                newDialog.setTitle("The category ALREADY EXISTS!");
+
+                                newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                newDialog.show();
                             }
                         }
 
-//                        // TODO: Remove
-//                        System.out.println("======== Type_TABLE =========");
-//                        Cursor test_Data = mDatabaseHelper.getData("type_table");
-//                        while(test_Data.moveToNext()) {
-//                            System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
-//                        }
-//                        System.out.println("=============================");
-//
-//                        System.out.println("======== " + newName + " =========");
-//                        Cursor test_Data2 = mDatabaseHelper.getData(newName);
-//                        while(test_Data.moveToNext()) {
-//                            System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
-//                        }
-//                        System.out.println("=============================");
-//
-//                        System.out.println("======== CategoryList =========");
-//                        for (int i = 0; i< categoryList.size(); i++) {
-//                            System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
-//                        }
-//                        System.out.println("=============================");
+                        // TODO: Remove
+                        System.out.println("======== Type_TABLE =========");
+                        Cursor test_Data = mDatabaseHelper.getData("type_table");
+                        while(test_Data.moveToNext()) {
+                            System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+                        }
+                        System.out.println("=============================");
+
+                        System.out.println("======== " + newName + " =========");
+                        Cursor test_Data2 = mDatabaseHelper.getData(newName);
+                        while(test_Data.moveToNext()) {
+                            System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
+                        }
+                        System.out.println("=============================");
+
+                        System.out.println("======== CategoryList =========");
+                        for (int i = 0; i< categoryList.size(); i++) {
+                            System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+                        }
+                        System.out.println("=============================");
                     }
                 });
 
@@ -220,44 +244,61 @@ public class MainActivity extends AppCompatActivity {
                     data.moveToLast();
                     newItemName = "New_Item" + (Integer.parseInt(data.getString(0)) + 1);
                 }
-                boolean insertData = mDatabaseHelper.addData("type_table", newItemName);
-                data = mDatabaseHelper.getData("type_table");
-                data.moveToLast(); // To set new category's id below
 
-                if (insertData) {
-                    // Add a new category into categoryList
-                    categoryList.add(new VersusCategory(data.getString(0), newItemName));
-                    categoryAdapter.notifyDataSetChanged();
+                // Check if there is duplicate name, and add if not
+                if (mDatabaseHelper.addTable(newItemName)) {
+                    boolean insertData = mDatabaseHelper.addData("type_table", newItemName);
+                    data = mDatabaseHelper.getData("type_table");
+                    data.moveToLast(); // To set new category's id below
 
-                    // Add a table corresponding to the category
-                    mDatabaseHelper.addTable(newItemName);
-                    mDatabaseHelper.addCountData(newItemName + "_Count", "0");
+                    if (insertData) {
+                        // Add a new category into categoryList
+                        categoryList.add(new VersusCategory(data.getString(0), newItemName));
+                        categoryAdapter.notifyDataSetChanged();
 
-                    Toast.makeText(MainActivity.this, "Added!", Toast.LENGTH_SHORT);
+                        mDatabaseHelper.addCountData(newItemName + "_Count", "0");
+
+                        Toast.makeText(MainActivity.this, "Added!", Toast.LENGTH_SHORT);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error Occurred", Toast.LENGTH_SHORT);
+                    }
                 } else {
-                    Toast.makeText(MainActivity.this, "Error Occurred", Toast.LENGTH_SHORT);
+                    // If newItemName is duplicate, show fail message
+                    AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+
+                    dialog.setTitle("The category ALREADY EXISTS!");
+
+                    dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    dialog.show();
                 }
 
-//                // TODO: Remove
-//                System.out.println("======== Type_TABLE =========");
-//                Cursor test_Data = mDatabaseHelper.getData("type_table");
-//                while(test_Data.moveToNext()) {
-//                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
-//                }
-//                System.out.println("=============================");
-//
-//                System.out.println("======== " + newItemName + " =========");
-//                Cursor test_Data2 = mDatabaseHelper.getData(newItemName);
-//                while(test_Data.moveToNext()) {
-//                    System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
-//                }
-//                System.out.println("=============================");
-//
-//                System.out.println("======== CategoryList =========");
-//                for (int i = 0; i< categoryList.size(); i++) {
-//                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
-//                }
-//                System.out.println("=============================");
+
+                // TODO: Remove
+                System.out.println("======== Type_TABLE =========");
+                Cursor test_Data = mDatabaseHelper.getData("type_table");
+                while(test_Data.moveToNext()) {
+                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+                }
+                System.out.println("=============================");
+
+                System.out.println("======== " + newItemName + " =========");
+                Cursor test_Data2 = mDatabaseHelper.getData(newItemName);
+                while(test_Data.moveToNext()) {
+                    System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
+                }
+                System.out.println("=============================");
+
+                System.out.println("======== CategoryList =========");
+                for (int i = 0; i< categoryList.size(); i++) {
+                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+                }
+                System.out.println("=============================");
             }
         });
 

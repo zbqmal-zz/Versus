@@ -156,11 +156,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     if (data.getPosition() == 0) {
                         TableRow categoryView = createTableRowForItemCategory(data_Category, table_Categories);
                         table_Categories.addView(categoryView);
-
-                        // Load category count
-//                        Cursor count_Data = mDatabaseHelper.getData(category_Name + "_Count");
-//                        count_Data.moveToNext();
-//                        mDatabaseHelper.updateData(category_Name + "_Count", "1", "Count", String.valueOf(Integer.parseInt(count_Data.getString(1)) + 1));
                     }
 
 
@@ -282,27 +277,46 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 count_Data.moveToNext();
                 String newCategoryName = "New_Category" + (Integer.parseInt(count_Data.getString(1)) + 1);
                 mDatabaseHelper.updateData(category_Name + "_Count", "1", "Count", String.valueOf(Integer.parseInt(count_Data.getString(1)) + 1));
-                mDatabaseHelper.addColumn(category_Name, newCategoryName);
+                if (mDatabaseHelper.addColumn(category_Name, newCategoryName)) {
 
-                // 2. into UI
-                // New Category
-                Cursor data = mDatabaseHelper.getData(category_Name);
-                data.moveToFirst();
-                TableRow newTableRow = createTableRowForItemCategory(newCategoryName, table_Categories);
-                table_Categories.addView(newTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                    // 2. into UI
+                    // New Category
+                    Cursor data = mDatabaseHelper.getData(category_Name);
+                    data.moveToFirst();
+                    TableRow newTableRow = createTableRowForItemCategory(newCategoryName, table_Categories);
+                    table_Categories.addView(newTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 
-                // New Values
-                TableRow newValueTableRow = new TableRow(CategoryActivity.this);
-                newValueTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                for (int i = 0; i < itemList.size(); i++) {
-                    TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 2, newValueTableRow);
-                    newValueTableRow.addView(newValueTextView);
-                }
-                table_Items.addView(newValueTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                    // New Values
+                    TableRow newValueTableRow = new TableRow(CategoryActivity.this);
+                    newValueTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                    for (int i = 0; i < itemList.size(); i++) {
+                        TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 2, newValueTableRow);
+                        newValueTableRow.addView(newValueTextView);
+                    }
+                    table_Items.addView(newValueTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 
-                // 3. into itemList
-                for (int i = 0; i < itemList.size(); i++) {
-                    itemList.get(i).getItemValues().add("New Value");
+                    // 3. into itemList
+                    for (int i = 0; i < itemList.size(); i++) {
+                        itemList.get(i).getItemValues().add("New Value");
+                    }
+                } else {
+
+                    // If newCategoryName is duplicate, decrement count again
+                    mDatabaseHelper.updateData(category_Name + "_Count", "1", "Count", String.valueOf(Integer.parseInt(count_Data.getString(1)) - 1));
+
+                    // Show fail message
+                    AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
+
+                    newDialog.setTitle("The category ALREADY EXISTS!");
+
+                    newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    newDialog.show();
                 }
 
                 // TODO: Remove ===========================================
@@ -352,8 +366,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemNameEditText = new EditText(CategoryActivity.this);
+                itemNameEditText.setText(newItemTextView.getText().toString(), TextView.BufferType.EDITABLE);
 
-                dialog.setTitle("New Item Name: \n");
+                dialog.setTitle("Edit Item Name: \n");
                 dialog.setView(itemNameEditText);
 
                 dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
@@ -418,17 +433,38 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        // Delete itemName from the DB
-                        mDatabaseHelper.deleteData(category_Name, id);
+                        // Delete data only if there are more than one data
+                        Cursor database = mDatabaseHelper.getData(category_Name);
+                        if (database.getCount() > 1) {
 
-                        // Delete itemName from UI
-                        int indexOfItemName = tableRow.indexOfChild(newItemTextView);
-                        tableRow.removeView(newItemTextView);
-                        for (int i = 0; i < itemList.get(0).getItemValueSize(); i++) {
-                            TableRow curr_Row = (TableRow) table_Items.getChildAt(i);
-                            curr_Row.removeView(curr_Row.getChildAt(indexOfItemName));
+                            // Delete itemName from the DB
+                            mDatabaseHelper.deleteData(category_Name, id);
+
+                            // Delete itemName from UI
+                            int indexOfItemName = tableRow.indexOfChild(newItemTextView);
+                            tableRow.removeView(newItemTextView);
+                            for (int i = 0; i < itemList.get(0).getItemValueSize(); i++) {
+                                TableRow curr_Row = (TableRow) table_Items.getChildAt(i);
+                                curr_Row.removeView(curr_Row.getChildAt(indexOfItemName));
+                            }
+                            itemList.remove(indexOfItemName);
+                        } else if (database.getCount() <= 1) {
+
+                            // Show fail message
+                            AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
+
+                            newDialog.setTitle("Can't delete all items!");
+
+                            newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            newDialog.show();
                         }
-                        itemList.remove(indexOfItemName);
+
 
                         // TODO: Remove ===========================================
                         System.out.println("============= item List ==============");
@@ -461,6 +497,17 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     }
                 });
 
+                // Disable Delete button when there is only one item name
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        Cursor database = mDatabaseHelper.getData(category_Name);
+                        if (database.getCount() <= 1) {
+                            ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+                        }
+                    }
+                });
+
                 dialog.show();
             }
         });
@@ -485,8 +532,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemCategoryEditText = new EditText(CategoryActivity.this);
+                itemCategoryEditText.setText(newTextView.getText().toString(), TextView.BufferType.EDITABLE);
 
-                dialog.setTitle("New Item Category: \n");
+                dialog.setTitle("Edit Item Category: \n");
                 dialog.setView(itemCategoryEditText);
 
                 dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
@@ -503,10 +551,27 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                         // Change on DB
                         String oldItemCategory = newTextView.getText().toString();
-                        mDatabaseHelper.renameColumn(category_Name, oldItemCategory, newItemCategory);
+                        if (mDatabaseHelper.renameColumn(category_Name, oldItemCategory, newItemCategory)) {
 
-                        // Change on UI
-                        newTextView.setText(newItemCategory);
+                            // Change on UI
+                            newTextView.setText(newItemCategory);
+                        } else {
+
+                            // Show fail message
+                            AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
+
+                            newDialog.setTitle("The category ALREADY EXISTS!");
+
+                            newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            newDialog.show();
+                        }
+
 
                         // TODO: Remove ===========================================
                         System.out.println("============= item List ==============");
@@ -542,17 +607,39 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Delete itemCategory from the DB
-                        String oldItemCategory = newTextView.getText().toString();
-                        mDatabaseHelper.deleteColumn(category_Name, oldItemCategory);
 
-                        // Delete itemName from UI
-                        int indexOfCategory = table_Categories.indexOfChild(newTableRow);
-                        table_Categories.removeView(newTableRow);
-                        table_Items.removeView(table_Items.getChildAt(indexOfCategory));
-                        for (int i = 0; i < itemList.size(); i++) {
-                            itemList.get(i).getItemValues().remove(indexOfCategory);
+                        // Delete category only if there are more than one category
+                        Cursor database = mDatabaseHelper.getData(category_Name);
+                        if (database.getColumnCount() > 3) {
+
+                            // Delete itemCategory from the DB
+                            String oldItemCategory = newTextView.getText().toString();
+                            mDatabaseHelper.deleteColumn(category_Name, oldItemCategory);
+
+                            // Delete itemName from UI
+                            int indexOfCategory = table_Categories.indexOfChild(newTableRow);
+                            table_Categories.removeView(newTableRow);
+                            table_Items.removeView(table_Items.getChildAt(indexOfCategory));
+                            for (int i = 0; i < itemList.size(); i++) {
+                                itemList.get(i).getItemValues().remove(indexOfCategory);
+                            }
+                        } else if (database.getColumnCount() <= 3) {
+
+                            // Show fail message
+                            AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
+
+                            newDialog.setTitle("Can't delete all categories!");
+
+                            newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            newDialog.show();
                         }
+
 
                         // TODO: Remove ===========================================
                         System.out.println("============= item List ==============");
@@ -585,6 +672,17 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     }
                 });
 
+                // Disable Delete button when there is only one category
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        Cursor database = mDatabaseHelper.getData(category_Name);
+                        if (database.getColumnCount() <= 3) {
+                            ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+                        }
+                    }
+                });
+
                 dialog.show();
             }
         });
@@ -609,8 +707,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemValueEditText = new EditText(CategoryActivity.this);
+                itemValueEditText.setText(newItemValueTextView.getText().toString(), TextView.BufferType.EDITABLE);
 
-                dialog.setTitle("New Item Value: \n");
+                dialog.setTitle("Edit Item Value: \n");
                 dialog.setView(itemValueEditText);
 
                 dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
