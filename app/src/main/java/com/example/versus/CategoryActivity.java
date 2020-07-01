@@ -366,7 +366,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemNameEditText = new EditText(CategoryActivity.this);
-                itemNameEditText.setText(newItemTextView.getText().toString(), TextView.BufferType.EDITABLE);
+                itemNameEditText.setHint(newItemTextView.getText().toString());
 
                 dialog.setTitle("Edit Item Name: \n");
                 dialog.setView(itemNameEditText);
@@ -532,7 +532,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemCategoryEditText = new EditText(CategoryActivity.this);
-                itemCategoryEditText.setText(newTextView.getText().toString(), TextView.BufferType.EDITABLE);
+                itemCategoryEditText.setHint(newTextView.getText().toString());
 
                 dialog.setTitle("Edit Item Category: \n");
                 dialog.setView(itemCategoryEditText);
@@ -707,7 +707,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             public void onClick(View v) {
                 AlertDialog dialog = new AlertDialog.Builder(CategoryActivity.this).create();
                 final EditText itemValueEditText = new EditText(CategoryActivity.this);
-                itemValueEditText.setText(newItemValueTextView.getText().toString(), TextView.BufferType.EDITABLE);
+                itemValueEditText.setHint(newItemValueTextView.getText().toString());
 
                 dialog.setTitle("Edit Item Value: \n");
                 dialog.setView(itemValueEditText);

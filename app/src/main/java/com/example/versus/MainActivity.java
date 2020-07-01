@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         itemLayoutManager = new LinearLayoutManager(this);
         categoryAdapter = new CategoryAdapter(categoryList);
 
-        categoryTextView = (TextView) findViewById(R.id.categoryNameTextView);
+        categoryTextView = findViewById(R.id.categoryNameTextView);
         dialog = new AlertDialog.Builder(this).create();
         categoryEditText = new EditText(this);
 
@@ -97,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 // Dialog for typing new name for the category
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
                 final EditText categoryEditText = new EditText(MainActivity.this);
+                categoryEditText.setHint(categoryList.get(position).getCategoryName());
 
-                dialog.setTitle("New Category Name: \n");
+                dialog.setTitle("Edit Category Name: \n");
                 dialog.setView(categoryEditText);
 
                 // Cancel button
