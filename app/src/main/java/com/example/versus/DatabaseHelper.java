@@ -14,6 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String ITEM_NAME = "name";
     private static final String ITEM_CATEGORY = "New_Category";
+    private static final String CATEGORY_COUNT = "Count";
 
     public DatabaseHelper(Context context) { super(context, TABLE_NAME_TYPE, null, 1); }
 
@@ -34,8 +35,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addTable(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        // Data Table
         String createItemTable = "CREATE TABLE '" + table_Name + "' (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT, '" + ITEM_CATEGORY + "' TEXT DEFAULT 'New Value')";
         db.execSQL(createItemTable);
+
+        // Count Table
+        String createCountTable = "CREATE TABLE " + table_Name + "_Count (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
+        db.execSQL(createCountTable);
     }
 
     /*
@@ -45,6 +52,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(TYPE_NAME, name);
+
+        long result = db.insert(table_Name, null, contentValues);
+        // if data as inserted incorrectly, it will return -1
+        if (result == -1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /*
+    Method for adding a data
+     */
+    public boolean addCountData(String table_Name, String data) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("Count", data);
 
         long result = db.insert(table_Name, null, contentValues);
         // if data as inserted incorrectly, it will return -1
@@ -106,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Cursor getData(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM '" + table_Name + "'";
+        String query = "SELECT * FROM " + table_Name;
         Cursor data = db.rawQuery(query, null);
         return data;
     }
@@ -131,6 +155,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteTable(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        // Drop table
         String dropTable = "DROP TABLE IF EXISTS " + table_Name;
         db.execSQL(dropTable);
     }
@@ -205,14 +231,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
         data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
-            if (column_Name.equals(data.getString(i))) {
-                createNewTable += (" " + data.getString(i) + " TEXT");
-            }
+            if (!column_Name.equals(data.getColumnName(i))) {
+                createNewTable += (" " + data.getColumnName(i) + " TEXT");
 
-            if (i < data.getColumnCount() - 1) {
-                createNewTable += ",";
-            } else {
-                createNewTable += ")";
+                if (i < data.getColumnCount() - 1) {
+                    createNewTable += ",";
+                } else {
+                    createNewTable += ")";
+                }
             }
         }
         db.execSQL(createNewTable);
@@ -225,7 +251,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues contentValues = new ContentValues();
             contentValues.put("ID", Integer.parseInt(data.getString(0)));
             for (int i = 1; i < data.getColumnCount(); i++) {
-                contentValues.put(data.getColumnName(i), data.getString(i));
+                if (!column_Name.equals(data.getColumnName(i))) {
+                    contentValues.put(data.getColumnName(i), data.getString(i));
+                }
             }
 
             // Add each value
