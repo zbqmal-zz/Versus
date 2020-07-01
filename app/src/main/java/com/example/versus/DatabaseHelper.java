@@ -130,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Cursor getData(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + table_Name;
+        String query = "SELECT * FROM '" + table_Name + "'";
         Cursor data = db.rawQuery(query, null);
         return data;
     }
@@ -157,7 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Drop table
-        String dropTable = "DROP TABLE IF EXISTS " + table_Name;
+        String dropTable = "DROP TABLE IF EXISTS '" + table_Name + "'";
         db.execSQL(dropTable);
     }
 
@@ -228,19 +228,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create new table
         SQLiteDatabase db = this.getWritableDatabase();
         String tempTableName = "temp_table";
-        String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
+        String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT";
         data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
             if (!column_Name.equals(data.getColumnName(i))) {
-                createNewTable += (" " + data.getColumnName(i) + " TEXT");
-
-                if (i < data.getColumnCount() - 1) {
-                    createNewTable += ",";
-                } else {
-                    createNewTable += ")";
-                }
+                createNewTable += (", " + data.getColumnName(i) + " TEXT");
             }
         }
+        createNewTable += ")";
         db.execSQL(createNewTable);
 
         // Copy and paste old table into new table
