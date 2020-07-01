@@ -33,16 +33,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for creating an item table
      */
-    public void addTable(String table_Name) {
+    public boolean addTable(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Data Table
-        String createItemTable = "CREATE TABLE '" + table_Name + "' (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT, '" + ITEM_CATEGORY + "' TEXT DEFAULT 'New Value')";
-        db.execSQL(createItemTable);
+        // Check if there is a duplicate table name with table_Name
+        boolean isUniqueName = true;
+        Cursor database = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        while (database.moveToNext()) {
+            if (table_Name.equals(database.getString(0))) {
+                isUniqueName = false;
+            }
+        }
 
-        // Count Table
-        String createCountTable = "CREATE TABLE " + table_Name + "_Count (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
-        db.execSQL(createCountTable);
+        if (isUniqueName) {
+            // Data Table
+            String createItemTable = "CREATE TABLE '" + table_Name + "' (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT, '" + ITEM_CATEGORY + "' TEXT DEFAULT 'New Value')";
+            db.execSQL(createItemTable);
+
+            // Count Table
+            String createCountTable = "CREATE TABLE " + table_Name + "_Count (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
+            db.execSQL(createCountTable);
+        }
+
+        return isUniqueName;
     }
 
     /*
@@ -105,14 +118,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for adding a column into item table
      */
-    public void addColumn(String table_Name, String columnName) {
+    public boolean addColumn(String table_Name, String columnName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String createColumn = "ALTER TABLE '" + table_Name + "' ADD COLUMN " + columnName + " TEXT DEFAULT 'New Value'";
-        db.execSQL(createColumn);
+
+        // Check if there is a duplicate column name with columnName
+        boolean isUniqueName = true;
+        Cursor database = getData(table_Name);
+        if (database.moveToNext()) {
+            for (int i = 2; i < database.getColumnCount(); i++) {
+                if (columnName.equals(database.getColumnName(i))) {
+                    isUniqueName = false;
+                }
+            }
+        }
+
+        if (isUniqueName) {
+            String createColumn = "ALTER TABLE '" + table_Name + "' ADD COLUMN " + columnName + " TEXT DEFAULT 'New Value'";
+            db.execSQL(createColumn);
+        }
+
+        return isUniqueName;
     }
 
     /*
     Method for updating data
+    TODO: Exception
      */
     public boolean updateData(String table_Name, String id, String category, String value) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -133,6 +163,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
+    /*
+    Method for deleting item data form a table
+    TODO: Exception
+     */
     public void deleteData(String table_Name, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
         String deleteData = "DELETE FROM '" + table_Name + "' WHERE ID = " + id;
@@ -142,14 +176,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for renaming table
      */
-    public void renameTable(String oldName, String newName) {
+    public boolean renameTable(String oldName, String newName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String renameTable = "ALTER TABLE '" + oldName + "' RENAME TO '" + newName + "'";
-        db.execSQL(renameTable);
+
+        // Check if there is a duplicate table name with table_Name
+        boolean isUniqueName = true;
+        Cursor database = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        while (database.moveToNext()) {
+            if (newName.equals(database.getString(0))) {
+                isUniqueName = false;
+            }
+        }
+
+        if (isUniqueName) {
+            String renameTable = "ALTER TABLE '" + oldName + "' RENAME TO '" + newName + "'";
+            db.execSQL(renameTable);
+        }
+
+        return isUniqueName;
     }
 
     /*
     Method for deleting a table from db
+    TODO: Exception
      */
     public void deleteTable(String table_Name) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -162,62 +211,78 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for renaming a column
      */
-    public void renameColumn(String table_Name, String old_Column_Name, String new_Column_Name) {
+    public boolean renameColumn(String table_Name, String old_Column_Name, String new_Column_Name) {
 
-        // Retrieve the data from old table
-        Cursor data = getData(table_Name);
-
-        // Create new table
-        SQLiteDatabase db = this.getWritableDatabase();
-        String tempTableName = "temp_table";
-        String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
-        data.moveToNext();
-        for (int i = 2; i < data.getColumnCount(); i++) {
-            System.out.println("old_Column_Name: " + old_Column_Name + ", new_Column_Name: " + new_Column_Name + ", data.getColumnName(" + i + "): " + data.getColumnName(i));
-            if (old_Column_Name.equals(data.getColumnName(i))) {
-                createNewTable += (" " + new_Column_Name + " TEXT");
-                System.out.println("Changed!");
-            } else {
-                createNewTable += (" " + data.getColumnName(i) + " TEXT");
-                System.out.println("Not Changed!");
-            }
-
-            if (i < data.getColumnCount() - 1) {
-                createNewTable += ",";
-            } else {
-                createNewTable += ")";
-            }
-        }
-        db.execSQL(createNewTable);
-
-        // Copy and paste old table into new table
-        data = getData(table_Name);
-        while (data.moveToNext()) {
-
-            // Put each value into contentValues
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("ID", Integer.parseInt(data.getString(0)));
-            for (int i = 1; i < data.getColumnCount(); i++) {
-                if (old_Column_Name.equals(data.getColumnName(i))) {
-                    contentValues.put(new_Column_Name, data.getString(i));
-                } else {
-                    contentValues.put(data.getColumnName(i), data.getString(i));
+        // Check if there is a duplicate column name with columnName
+        boolean isUniqueName = true;
+        Cursor database = getData(table_Name);
+        if (database.moveToNext()) {
+            for (int i = 2; i < database.getColumnCount(); i++) {
+                if (new_Column_Name.equals(database.getColumnName(i))) {
+                    isUniqueName = false;
                 }
             }
-
-            // Add each value
-            db.insert(tempTableName, null, contentValues);
         }
 
-        // Delete the old table
-        deleteTable(table_Name);
+        if (isUniqueName) {
+            // Retrieve the data from old table
+            Cursor data = getData(table_Name);
 
-        // Rename new table as the old name
-        renameTable(tempTableName, table_Name);
+            // Create new table
+            SQLiteDatabase db = this.getWritableDatabase();
+            String tempTableName = "temp_table";
+            String createNewTable = "CREATE TABLE " + tempTableName + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT,";
+            data.moveToNext();
+            for (int i = 2; i < data.getColumnCount(); i++) {
+                System.out.println("old_Column_Name: " + old_Column_Name + ", new_Column_Name: " + new_Column_Name + ", data.getColumnName(" + i + "): " + data.getColumnName(i));
+                if (old_Column_Name.equals(data.getColumnName(i))) {
+                    createNewTable += (" " + new_Column_Name + " TEXT");
+                    System.out.println("Changed!");
+                } else {
+                    createNewTable += (" " + data.getColumnName(i) + " TEXT");
+                    System.out.println("Not Changed!");
+                }
+
+                if (i < data.getColumnCount() - 1) {
+                    createNewTable += ",";
+                } else {
+                    createNewTable += ")";
+                }
+            }
+            db.execSQL(createNewTable);
+
+            // Copy and paste old table into new table
+            data = getData(table_Name);
+            while (data.moveToNext()) {
+
+                // Put each value into contentValues
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("ID", Integer.parseInt(data.getString(0)));
+                for (int i = 1; i < data.getColumnCount(); i++) {
+                    if (old_Column_Name.equals(data.getColumnName(i))) {
+                        contentValues.put(new_Column_Name, data.getString(i));
+                    } else {
+                        contentValues.put(data.getColumnName(i), data.getString(i));
+                    }
+                }
+
+                // Add each value
+                db.insert(tempTableName, null, contentValues);
+            }
+
+            // Delete the old table
+            deleteTable(table_Name);
+
+            // Rename new table as the old name
+            renameTable(tempTableName, table_Name);
+        }
+
+        return isUniqueName;
     }
 
     /*
     Method for deleting a column
+    TODO: Exception
      */
     public void deleteColumn(String table_Name, String column_Name) {
         // Retrieve the data from old table
