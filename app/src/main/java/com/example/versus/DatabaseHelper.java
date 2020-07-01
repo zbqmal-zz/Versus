@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TYPE_NAME, name);
 
-        long result = db.insert(table_Name, null, contentValues);
+        long result = db.insert("'" + table_Name + "'", null, contentValues);
         // if data as inserted incorrectly, it will return -1
         if (result == -1) {
             return false;
@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put("Count", data);
 
-        long result = db.insert(table_Name, null, contentValues);
+        long result = db.insert("'" + table_Name + "'", null, contentValues);
         // if data as inserted incorrectly, it will return -1
         if (result == -1) {
             return false;
@@ -93,7 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(data.getColumnName(i), newItemValue);
         }
 
-        long result = db.insert(table_Name, null, contentValues);
+        long result = db.insert("'" + table_Name + "'", null, contentValues);
         // if data as inserted incorrectly, it will return -1
         if (result == -1) {
             return false;
@@ -115,13 +115,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     Method for updating data
      */
     public boolean updateData(String table_Name, String id, String category, String value) {
-        System.out.println("table_Name: " + table_Name + ", id: " + id + ", category: " + category + ", value: " + value);
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("ID", id);
         contentValues.put(category, value);
-        db.update(table_Name, contentValues, "ID = ?", new String[] { id });
+        db.update("'" + table_Name + "'", contentValues, "ID = ?", new String[] { id });
         return true;
     }
 
@@ -137,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteData(String table_Name, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String deleteData = "DELETE FROM " + table_Name + " WHERE ID = " + id;
+        String deleteData = "DELETE FROM '" + table_Name + "' WHERE ID = " + id;
         db.execSQL(deleteData);
     }
 
