@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // TODO: When trying to rename with existing name
 
-                        if (old_Name == newName) {
+                        if (old_Name.equals(newName)) {
                             dialog.dismiss();
                         } else {
                             // Update categoryList for SQLite
@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     // Rename table name
                                     mDatabaseHelper.renameTable(old_Name, newName);
+                                    mDatabaseHelper.renameTable(old_Name + "_Count", newName + "_Count");
 
                                     Toast.makeText(MainActivity.this, "Updated!", Toast.LENGTH_SHORT).show();
                                 } else {
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Drop the table for items
                 mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName());
+                mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName() + "_Count");
 
                 // Delete category from the list and adapter
                 categoryList.remove(position);
@@ -218,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
                     data.moveToLast();
                     newItemName = "New_Item" + (Integer.parseInt(data.getString(0)) + 1);
                 }
-                System.out.println("newItemName: " + newItemName);
                 boolean insertData = mDatabaseHelper.addData("type_table", newItemName);
                 data = mDatabaseHelper.getData("type_table");
                 data.moveToLast(); // To set new category's id below
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Add a table corresponding to the category
                     mDatabaseHelper.addTable(newItemName);
+                    mDatabaseHelper.addCountData(newItemName + "_Count", "0");
 
                     Toast.makeText(MainActivity.this, "Added!", Toast.LENGTH_SHORT);
                 } else {
