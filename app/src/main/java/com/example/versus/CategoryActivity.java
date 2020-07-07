@@ -384,19 +384,35 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                         String newItemName = itemNameEditText.getText().toString();
 
-                        // Change on database
-                        mDatabaseHelper.updateData(category_Name, id, "name", newItemName);
+                        if (newItemName.equals("")) {
+                            // Show fail message
+                            AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
 
-                        // Change on itemList
-                        for (int i = 0; i < itemList.size(); i++) {
-                            if (itemList.get(i).getItemID().equals(id)) {
-                                itemList.get(i).setItemName(newItemName);
-                                break;
+                            newDialog.setTitle("Item name must be at least one character.");
+
+                            newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            newDialog.show();
+                        } else {
+                            // Change on database
+                            mDatabaseHelper.updateData(category_Name, id, "name", newItemName);
+
+                            // Change on itemList
+                            for (int i = 0; i < itemList.size(); i++) {
+                                if (itemList.get(i).getItemID().equals(id)) {
+                                    itemList.get(i).setItemName(newItemName);
+                                    break;
+                                }
                             }
-                        }
 
-                        // Change on UI
-                        newItemTextView.setText(newItemName);
+                            // Change on UI
+                            newItemTextView.setText(newItemName);
+                        }
 
                         // TODO: Remove ===========================================
                         System.out.println("============= item List ==============");
@@ -549,18 +565,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     public void onClick(DialogInterface dialog, int which) {
                         String newItemCategory = itemCategoryEditText.getText().toString();
 
-                        // Change on DB
-                        String oldItemCategory = newTextView.getText().toString();
-                        if (mDatabaseHelper.renameColumn(category_Name, oldItemCategory, newItemCategory)) {
-
-                            // Change on UI
-                            newTextView.setText(newItemCategory);
-                        } else {
-
+                        if (newItemCategory.equals("")) {
                             // Show fail message
                             AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
 
-                            newDialog.setTitle("The category ALREADY EXISTS!");
+                            newDialog.setTitle("Item category must be at least one character.");
 
                             newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
                                 @Override
@@ -570,6 +579,29 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                             });
 
                             newDialog.show();
+                        } else {
+                            // Change on DB
+                            String oldItemCategory = newTextView.getText().toString();
+                            if (mDatabaseHelper.renameColumn(category_Name, oldItemCategory, newItemCategory)) {
+
+                                // Change on UI
+                                newTextView.setText(newItemCategory);
+                            } else {
+
+                                // Show fail message
+                                AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
+
+                                newDialog.setTitle("The category ALREADY EXISTS!");
+
+                                newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                newDialog.show();
+                            }
                         }
 
 
@@ -724,21 +756,38 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     public void onClick(DialogInterface dialog, int which) {
                         String newItemValue = itemValueEditText.getText().toString();
 
-                        // Change on DB
-                        int indexOfCategory = table_Items.indexOfChild(tableRow);
-                        Cursor data = mDatabaseHelper.getData(category_Name);
-                        mDatabaseHelper.updateData(category_Name, id, data.getColumnName(indexOfCategory + 2), newItemValue);
+                        if (newItemValue.equals("")) {
+                            // Show fail message
+                            AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
 
-                        // Change on itemList
-                        for (int i = 0; i < itemList.size(); i++) {
-                            if (itemList.get(i).getItemID() == id) {
-                                itemList.get(i).setItemValue(indexOfCategory, newItemValue);
-                                break;
+                            newDialog.setTitle("Item value must be at least one character.");
+
+                            newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            newDialog.show();
+                        } else {
+                            // Change on DB
+                            int indexOfCategory = table_Items.indexOfChild(tableRow);
+                            Cursor data = mDatabaseHelper.getData(category_Name);
+                            mDatabaseHelper.updateData(category_Name, id, data.getColumnName(indexOfCategory + 2), newItemValue);
+
+                            // Change on itemList
+                            for (int i = 0; i < itemList.size(); i++) {
+                                if (itemList.get(i).getItemID() == id) {
+                                    itemList.get(i).setItemValue(indexOfCategory, newItemValue);
+                                    break;
+                                }
                             }
+
+                            // Change on UI
+                            newItemValueTextView.setText(newItemValue);
                         }
 
-                        // Change on UI
-                        newItemValueTextView.setText(newItemValue);
 
                         // TODO: Remove ===========================================
                         System.out.println("============= item List ==============");
