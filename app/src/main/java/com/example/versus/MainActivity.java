@@ -7,14 +7,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 categoryList.add(new VersusCategory(data.getString(0), data.getString(1)));
             }
         }
+        data.close();
     }
 
     /*
@@ -130,8 +129,9 @@ public class MainActivity extends AppCompatActivity {
                                     categoryList.get(category_Position).setCategoryName(newName);
                                     categoryAdapter.notifyDataSetChanged();
 
-                                    // Rename Count table
+                                    // Rename Count&Image table
                                     mDatabaseHelper.renameTable(old_Name + "_Count", newName + "_Count");
+                                    mDatabaseHelper.renameTable(old_Name + "_Image", newName + "_Image");
                                 } else {
                                     // If newItemName is duplicate, show fail message
                                     AlertDialog newDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -165,27 +165,6 @@ public class MainActivity extends AppCompatActivity {
                                 newDialog.show();
                             }
                         }
-
-                        // TODO: Remove
-                        System.out.println("======== Type_TABLE =========");
-                        Cursor test_Data = mDatabaseHelper.getData("type_table");
-                        while(test_Data.moveToNext()) {
-                            System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
-                        }
-                        System.out.println("=============================");
-
-                        System.out.println("======== " + newName + " =========");
-                        Cursor test_Data2 = mDatabaseHelper.getData(newName);
-                        while(test_Data.moveToNext()) {
-                            System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
-                        }
-                        System.out.println("=============================");
-
-                        System.out.println("======== CategoryList =========");
-                        for (int i = 0; i< categoryList.size(); i++) {
-                            System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
-                        }
-                        System.out.println("=============================");
                     }
                 });
 
@@ -199,29 +178,14 @@ public class MainActivity extends AppCompatActivity {
                 String oldName = categoryList.get(position).getCategoryName();
                 mDatabaseHelper.deleteData("type_table", categoryList.get(position).getCategoryID());
 
-                // Drop the table for items
+                // Drop all tables for items
                 mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName());
                 mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName() + "_Count");
+                mDatabaseHelper.deleteTable(categoryList.get(position).getCategoryName() + "_Image");
 
                 // Delete category from the list and adapter
                 categoryList.remove(position);
                 categoryAdapter.notifyItemRemoved(position);
-
-//                // TODO: Remove
-//                System.out.println("======== Type_TABLE =========");
-//                Cursor test_Data = mDatabaseHelper.getData("type_table");
-//                while(test_Data.moveToNext()) {
-//                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
-//                }
-//                System.out.println("mDatabaseHelper.getData(" + oldName + "): " + mDatabaseHelper.getData(oldName));
-//                System.out.println("=============================");
-//
-//                System.out.println("======== CategoryList =========");
-//                for (int i = 0; i< categoryList.size(); i++) {
-//                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
-//                }
-//                System.out.println("=============================");
-
             }
         });
     }
@@ -257,6 +221,10 @@ public class MainActivity extends AppCompatActivity {
                         categoryList.add(new VersusCategory(data.getString(0), newItemName));
                         categoryAdapter.notifyDataSetChanged();
 
+                        // Add a new null image and countData into db
+                        mDatabaseHelper.insertImage(newItemName + "_Image", null);
+
+                        // Add a countData into db
                         mDatabaseHelper.addCountData(newItemName + "_Count", "0");
 
                         Toast.makeText(MainActivity.this, "Added!", Toast.LENGTH_SHORT);
@@ -278,28 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
                     dialog.show();
                 }
-
-
-                // TODO: Remove
-                System.out.println("======== Type_TABLE =========");
-                Cursor test_Data = mDatabaseHelper.getData("type_table");
-                while(test_Data.moveToNext()) {
-                    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
-                }
-                System.out.println("=============================");
-
-                System.out.println("======== " + newItemName + " =========");
-                Cursor test_Data2 = mDatabaseHelper.getData(newItemName);
-                while(test_Data.moveToNext()) {
-                    System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
-                }
-                System.out.println("=============================");
-
-                System.out.println("======== CategoryList =========");
-                for (int i = 0; i< categoryList.size(); i++) {
-                    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
-                }
-                System.out.println("=============================");
+                data.close();
             }
         });
 
@@ -317,3 +264,26 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
+
+// TO CHECK DATABASE AND ITEMLIST
+//System.out.println("======== Type_TABLE =========");
+//Cursor test_Data = mDatabaseHelper.getData("type_table");
+//while(test_Data.moveToNext()) {
+//    System.out.println(test_Data.getString(0) + ", " + test_Data.getString(1));
+//}
+//System.out.println("=============================");
+//test_Data.close();
+//
+//System.out.println("======== " + newItemName + " =========");
+//Cursor test_Data2 = mDatabaseHelper.getData(newItemName);
+//while(test_Data.moveToNext()) {
+//    System.out.println(test_Data2.getString(0) + ", " + test_Data2.getString(1));
+//}
+//System.out.println("=============================");
+//test_Data2.close();
+//
+//System.out.println("======== CategoryList =========");
+//for (int i = 0; i< categoryList.size(); i++) {
+//    System.out.println(categoryList.get(i).getCategoryID() + ", " + categoryList.get(i).getCategoryName());
+//}
+//System.out.println("=============================");

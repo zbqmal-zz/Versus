@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
@@ -50,10 +52,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String createItemTable = "CREATE TABLE '" + table_Name + "' (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT, '" + ITEM_CATEGORY + "' TEXT DEFAULT 'New Value')";
             db.execSQL(createItemTable);
 
+            // Image Table
+            String createImageTable = "CREATE TABLE " + table_Name + "_Image (ID INTEGER PRIMARY KEY AUTOINCREMENT, image BLOB)";
+            db.execSQL(createImageTable);
+
             // Count Table
             String createCountTable = "CREATE TABLE " + table_Name + "_Count (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
             db.execSQL(createCountTable);
         }
+
+        database.close();
 
         return isUniqueName;
     }
@@ -106,6 +114,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(data.getColumnName(i), newItemValue);
         }
 
+        data.close();
+
         long result = db.insert("'" + table_Name + "'", null, contentValues);
         // if data as inserted incorrectly, it will return -1
         if (result == -1) {
@@ -131,6 +141,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
+
+        database.close();
 
         if (isUniqueName) {
             String createColumn = "ALTER TABLE '" + table_Name + "' ADD COLUMN " + columnName + " TEXT DEFAULT 'New Value'";
@@ -164,6 +176,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /*
+    Method for getting specific data with id from a table
+     */
+    public Cursor getData(String table_Name, String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + table_Name + " WHERE ID = " + id;
+        Cursor data = db.rawQuery(query, null);
+        return data;
+    }
+
+    /*
+    Method for getting image data with id
+     */
+//    public byte[] getImage(String table_Name, String id) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//    }
+
+    /*
     Method for deleting item data form a table
     TODO: Exception
      */
@@ -187,6 +216,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 isUniqueName = false;
             }
         }
+        database.close();
 
         if (isUniqueName) {
             String renameTable = "ALTER TABLE '" + oldName + "' RENAME TO '" + newName + "'";
@@ -275,7 +305,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Rename new table as the old name
             renameTable(tempTableName, table_Name);
+
+            data.close();
         }
+
+        database.close();
 
         return isUniqueName;
     }
@@ -323,5 +357,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Rename new table as the old name
         renameTable(tempTableName, table_Name);
+
+        data.close();
+    }
+
+    /*
+    Method for inserting image to DB
+     */
+    public void insertImage(String table_Name, byte img[]) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("image", img);
+        db.insert(table_Name, null, contentValues);
+    }
+
+    /*
+    Method for updating image
+     */
+    public void updateImage(String table_Name, String id, String imagePath) { /* byte img[] */
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+//        contentValues.put("image", img);
+        contentValues.put("image", imagePath);
+        db.update("'" + table_Name + "'", contentValues, "ID = ?", new String[] { id });
+    }
+
+    /*
+    Method for retrieving image from DB
+     */
+    public Bitmap getImage(String table_Name, Integer id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Bitmap bitmap = null;
+        Cursor data = db.rawQuery("SELECT * FROM " + table_Name + " WHERE ID = ?", new String[]{String.valueOf(id)});
+
+        if (data.moveToNext()) {
+            if (data.getBlob(1) != null) {
+                byte img[] = data.getBlob(1);
+                bitmap = BitmapFactory.decodeByteArray(img, 0, img.length);
+            }
+        }
+        data.close();
+
+        return bitmap;
     }
 }
