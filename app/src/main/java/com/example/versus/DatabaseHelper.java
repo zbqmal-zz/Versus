@@ -53,11 +53,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(createItemTable);
 
             // Image Table
-            String createImageTable = "CREATE TABLE " + table_Name + "_Image (ID INTEGER PRIMARY KEY AUTOINCREMENT, image BLOB)";
+            String createImageTable = "CREATE TABLE '" + table_Name + "_Image' (ID INTEGER PRIMARY KEY AUTOINCREMENT, image BLOB)";
             db.execSQL(createImageTable);
 
             // Count Table
-            String createCountTable = "CREATE TABLE " + table_Name + "_Count (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
+            String createCountTable = "CREATE TABLE '" + table_Name + "_Count' (ID INTEGER PRIMARY KEY AUTOINCREMENT, '" + CATEGORY_COUNT + "' INT DEFAULT 0)";
             db.execSQL(createCountTable);
         }
 
@@ -111,7 +111,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(ITEM_NAME, newItemName);
 
         for (int i = 2; i < data.getColumnCount(); i++) {
-            contentValues.put(data.getColumnName(i), newItemValue);
+            contentValues.put("'" + data.getColumnName(i) + "'", newItemValue);
         }
 
         data.close();
@@ -160,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("ID", id);
-        contentValues.put(category, value);
+        contentValues.put("'" + category + "'", value);
         db.update("'" + table_Name + "'", contentValues, "ID = ?", new String[] { id });
         return true;
     }
@@ -180,7 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Cursor getData(String table_Name, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + table_Name + " WHERE ID = " + id;
+        String query = "SELECT * FROM '" + table_Name + "' WHERE ID = " + id;
         Cursor data = db.rawQuery(query, null);
         return data;
     }
@@ -240,6 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /*
     Method for renaming a column
+    TODO: CAN'T BE ID AND NAME OR INClUDING !@#$%^&*()
      */
     public boolean renameColumn(String table_Name, String old_Column_Name, String new_Column_Name) {
 
@@ -266,10 +267,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             for (int i = 2; i < data.getColumnCount(); i++) {
                 System.out.println("old_Column_Name: " + old_Column_Name + ", new_Column_Name: " + new_Column_Name + ", data.getColumnName(" + i + "): " + data.getColumnName(i));
                 if (old_Column_Name.equals(data.getColumnName(i))) {
-                    createNewTable += (" " + new_Column_Name + " TEXT");
+                    createNewTable += (" '" + new_Column_Name + "' TEXT");
                     System.out.println("Changed!");
                 } else {
-                    createNewTable += (" " + data.getColumnName(i) + " TEXT");
+                    createNewTable += (" '" + data.getColumnName(i) + "' TEXT");
                     System.out.println("Not Changed!");
                 }
 
@@ -288,11 +289,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Put each value into contentValues
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("ID", Integer.parseInt(data.getString(0)));
+                System.out.println("getString(0): " + data.getString(0));
+                System.out.println("new_Column_Name: " + new_Column_Name);
                 for (int i = 1; i < data.getColumnCount(); i++) {
+                    System.out.println("getColumnName(" + i + "): " + data.getColumnName(i));
+                    System.out.println("old_Column_Name: " + old_Column_Name);
+                    System.out.println("getString(" + i + "): " + data.getString(i));
                     if (old_Column_Name.equals(data.getColumnName(i))) {
-                        contentValues.put(new_Column_Name, data.getString(i));
+                        System.out.println("YES");
+                        contentValues.put("'" + new_Column_Name + "'", data.getString(i));
                     } else {
-                        contentValues.put(data.getColumnName(i), data.getString(i));
+                        System.out.println("NO");
+                        contentValues.put("'" + data.getColumnName(i) + "'", data.getString(i));
                     }
                 }
 
@@ -329,7 +337,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         data.moveToNext();
         for (int i = 2; i < data.getColumnCount(); i++) {
             if (!column_Name.equals(data.getColumnName(i))) {
-                createNewTable += (", " + data.getColumnName(i) + " TEXT");
+                createNewTable += (", '" + data.getColumnName(i) + "' TEXT");
             }
         }
         createNewTable += ")";
@@ -344,7 +352,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             contentValues.put("ID", Integer.parseInt(data.getString(0)));
             for (int i = 1; i < data.getColumnCount(); i++) {
                 if (!column_Name.equals(data.getColumnName(i))) {
-                    contentValues.put(data.getColumnName(i), data.getString(i));
+                    contentValues.put("'" + data.getColumnName(i) + "'", data.getString(i));
                 }
             }
 
@@ -364,12 +372,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for inserting image to DB
      */
-    public void insertImage(String table_Name, byte img[]) {
+    public void insertImage(String table_Name, String imageURI) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put("image", img);
-        db.insert(table_Name, null, contentValues);
+        contentValues.put("image", imageURI);
+        db.insert("'" + table_Name + "'", null, contentValues);
     }
 
     /*
@@ -382,24 +390,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        contentValues.put("image", img);
         contentValues.put("image", imagePath);
         db.update("'" + table_Name + "'", contentValues, "ID = ?", new String[] { id });
-    }
-
-    /*
-    Method for retrieving image from DB
-     */
-    public Bitmap getImage(String table_Name, Integer id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Bitmap bitmap = null;
-        Cursor data = db.rawQuery("SELECT * FROM " + table_Name + " WHERE ID = ?", new String[]{String.valueOf(id)});
-
-        if (data.moveToNext()) {
-            if (data.getBlob(1) != null) {
-                byte img[] = data.getBlob(1);
-                bitmap = BitmapFactory.decodeByteArray(img, 0, img.length);
-            }
-        }
-        data.close();
-
-        return bitmap;
     }
 }

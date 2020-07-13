@@ -10,6 +10,7 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,8 +23,10 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -43,9 +46,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     DatabaseHelper mDatabaseHelper;
 
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int GALLERY_REQUEST_CODE = 123;
     static final int CAMERA_PERM_CODE = 101;
     static final int CAMERA_REQUEST_CODE = 102;
 
+    private boolean zoomOut = false;
     private String category_Name,
                    currentPhotoPath,
                    currentPhotoID;
@@ -111,6 +116,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
+        // Choosing "Take Photo"
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 File f = new File(currentPhotoPath);
@@ -128,12 +134,26 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                // Store image data into DB
                 if (imageData != null) {
-                    mDatabaseHelper.updateImage(category_Name + "_Image", currentPhotoID, currentPhotoPath);
+                    mDatabaseHelper.updateImage(category_Name + "_Image", currentPhotoID, Uri.fromFile(f).toString());
                 }
 
                 // Upload the pic on UI
                 image_Taken.setImageURI(Uri.fromFile(f));
+            }
+        }
+
+        // Choosing "Choose From Gallery"
+        if (requestCode == GALLERY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+
+                // Update image data in DB
+                mDatabaseHelper.updateImage(category_Name + "_Image", currentPhotoID, data.getData().toString());
+
+                // Update image in UI
+                image_Taken.setImageURI(data.getData());
             }
         }
 
@@ -258,7 +278,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         TableRow categoryView = createTableRowForItemCategory(data_Category, table_Categories);
                         table_Categories.addView(categoryView);
                     }
-
 
                     if (data.getPosition() == 0) {
                         // For ItemValues
@@ -524,35 +543,70 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     /*
     Function for creating TextView for item name
      */
-    private TextView createTextViewForItemName(final String id, String itemName, String imagePath, final TableRow tableRow) {
+    private TextView createTextViewForItemName(final String id, String itemName, final String imageURI, final TableRow tableRow) {
 
         // ItemImage ImageView
+        final TextView newItemTextView = new TextView(CategoryActivity.this);
         final ImageView newItemImageView = new ImageView(CategoryActivity.this);
         newItemImageView.setForegroundGravity(Gravity.CENTER);
 
-        if (imagePath == null) {
+        if (imageURI == null) {
             newItemImageView.setImageResource(R.drawable.ic_item_image);
         } else {
 
             // Set imageView with filePath
-            File f = new File(imagePath);
-            newItemImageView.setImageURI(Uri.fromFile(f));
+//            File f = new File(imagePath);
+            newItemImageView.setImageURI(Uri.parse(imageURI));
         }
         newItemImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Taking a picture and store & place the photo onto UI and DB
 
+                // Taking a picture and store & place the photo onto UI and DB
                 image_Taken = newItemImageView;
                 currentPhotoID = id;
 
-                // Ask camera permission
-                if (ContextCompat.checkSelfPermission(CategoryActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(CategoryActivity.this, new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
-                } else {
-                    dispatchTakePictureIntent();
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(CategoryActivity.this);
+                builder.setTitle(newItemTextView.getText().toString() + " \n");
+                String[] menu = {"View Photo", "Take Photo", "Choose From Gallery", "Cancel"};
+                builder.setItems(menu, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: // View Photo
+                                Intent intent = new Intent(CategoryActivity.this, ItemImageActivity.class);
 
+                                Cursor imageData = mDatabaseHelper.getData(category_Name + "_Image", id);
+                                imageData.moveToNext();
+                                intent.putExtra("imageURI", imageData.getString(1));
+
+                                startActivity(intent);
+                                break;
+
+                            case 1: // Take Photo
+
+                                // Ask camera permission
+                                if (ContextCompat.checkSelfPermission(CategoryActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(CategoryActivity.this, new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+                                } else {
+                                    dispatchTakePictureIntent();
+                                }
+                                break;
+
+                            case 2: // Choose From Gallery
+                                Intent gallery = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                startActivityForResult(gallery, GALLERY_REQUEST_CODE);
+                                break;
+
+                            case 3: // Cancel
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
         table_ItemImages.addView(newItemImageView);
@@ -560,7 +614,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         newItemImageView.getLayoutParams().height = 150;
 
         // ItemName TextView
-        final TextView newItemTextView = new TextView(CategoryActivity.this);
         newItemTextView.setText(itemName);
         newItemTextView.setGravity(Gravity.CENTER);
         newItemTextView.setWidth(300);
@@ -1145,6 +1198,20 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         }
 
         return byteBuffer.toByteArray();
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 }
 
