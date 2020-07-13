@@ -10,11 +10,11 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,10 +23,8 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -141,7 +139,15 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
 
                 // Upload the pic on UI
-                image_Taken.setImageURI(Uri.fromFile(f));
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(CategoryActivity.this.getContentResolver(), Uri.fromFile(f));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                image_Taken.setImageBitmap(bitmap);
+                image_Taken.setRotation(90);
+//                image_Taken.setImageURI(Uri.fromFile(f));
             }
         }
 
@@ -153,7 +159,15 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 mDatabaseHelper.updateImage(category_Name + "_Image", currentPhotoID, data.getData().toString());
 
                 // Update image in UI
-                image_Taken.setImageURI(data.getData());
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(CategoryActivity.this.getContentResolver(), data.getData());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                image_Taken.setImageBitmap(bitmap);
+                image_Taken.setRotation(90);
+//                image_Taken.setImageURI(data.getData());
             }
         }
 
@@ -264,7 +278,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 TextView nameView = null;
                 Cursor imageData = mDatabaseHelper.getData(category_Name + "_Image", data_ID);
                 imageData.moveToNext();
-                nameView = createTextViewForItemName(data_ID, data_Name, imageData.getString(1), table_ItemNames);
+//                try {
+                    nameView = createTextViewForItemName(data_ID, data_Name, imageData.getString(1), table_ItemNames);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 table_ItemNames.addView(nameView);
 
                 // Instantiate each VersusItem
@@ -385,7 +403,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 data.moveToLast();
                 String newId = data.getString(0);
                 TextView newItemTextView = null;
-                newItemTextView = createTextViewForItemName(newId, "New Item", null, table_ItemNames);
+//                try {
+                    newItemTextView = createTextViewForItemName(newId, "New Item", null, table_ItemNames);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 table_ItemNames.addView(newItemTextView);
                 for (int i = 2; i < data.getColumnCount(); i++) {
 
@@ -555,8 +577,17 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         } else {
 
             // Set imageView with filePath
-//            File f = new File(imagePath);
-            newItemImageView.setImageURI(Uri.parse(imageURI));
+//            newItemImageView.setImageURI(Uri.parse(imageURI));
+
+            Uri imageUri = Uri.parse(imageURI);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(CategoryActivity.this.getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            newItemImageView.setImageBitmap(bitmap);
+            newItemImageView.setRotation(90);
         }
         newItemImageView.setOnClickListener(new View.OnClickListener() {
             @Override
