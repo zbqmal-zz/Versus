@@ -875,7 +875,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                                 // Show fail message
                                 AlertDialog newDialog = new AlertDialog.Builder(CategoryActivity.this).create();
 
-                                newDialog.setTitle("The category ALREADY EXISTS!");
+                                newDialog.setTitle("The name already exists, OR can't contain special characters.");
 
                                 newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
                                     @Override

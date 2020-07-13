@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                                 // If newItemName is duplicate, show fail message
                                 AlertDialog newDialog = new AlertDialog.Builder(MainActivity.this).create();
 
-                                newDialog.setTitle("The category ALREADY EXISTS!");
+                                newDialog.setTitle("The category already exists, OR can't contain special characters.");
 
                                 newDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Confirm", new DialogInterface.OnClickListener() {
                                     @Override

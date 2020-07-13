@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
 
@@ -42,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isUniqueName = true;
         Cursor database = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         while (database.moveToNext()) {
-            if (table_Name.equals(database.getString(0))) {
+            if (table_Name.toUpperCase().equals(database.getString(0).toUpperCase())) {
                 isUniqueName = false;
             }
         }
@@ -136,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor database = getData(table_Name);
         if (database.moveToNext()) {
             for (int i = 2; i < database.getColumnCount(); i++) {
-                if (columnName.equals(database.getColumnName(i))) {
+                if (columnName.toUpperCase().equals(database.getColumnName(i).toUpperCase())) {
                     isUniqueName = false;
                 }
             }
@@ -206,13 +209,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     Method for renaming table
      */
     public boolean renameTable(String oldName, String newName) {
+
+        // Check if new name contains special characters
+        Pattern regex = Pattern.compile("[$&+,:;=?@#|]");
+        Matcher matcher = regex.matcher(newName);
+        if (matcher.find()) {
+            return false;
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Check if there is a duplicate table name with table_Name
         boolean isUniqueName = true;
         Cursor database = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         while (database.moveToNext()) {
-            if (newName.equals(database.getString(0))) {
+            if (newName.toUpperCase().equals(database.getString(0).toUpperCase())) {
                 isUniqueName = false;
             }
         }
@@ -244,12 +255,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public boolean renameColumn(String table_Name, String old_Column_Name, String new_Column_Name) {
 
+        // Check if new name contains special characters
+        Pattern regex = Pattern.compile("[$&+,:;=?@#|]");
+        Matcher matcher = regex.matcher(new_Column_Name);
+        if (matcher.find()) {
+            return false;
+        }
+
         // Check if there is a duplicate column name with columnName
         boolean isUniqueName = true;
         Cursor database = getData(table_Name);
         if (database.moveToNext()) {
             for (int i = 2; i < database.getColumnCount(); i++) {
-                if (new_Column_Name.equals(database.getColumnName(i))) {
+                if (new_Column_Name.toUpperCase().equals(database.getColumnName(i).toUpperCase())) {
                     isUniqueName = false;
                 }
             }
