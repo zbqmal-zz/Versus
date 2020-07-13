@@ -5,8 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -187,13 +185,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor data = db.rawQuery(query, null);
         return data;
     }
-
-    /*
-    Method for getting image data with id
-     */
-//    public byte[] getImage(String table_Name, String id) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//    }
 
     /*
     Method for deleting item data form a table

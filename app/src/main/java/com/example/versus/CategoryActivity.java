@@ -147,7 +147,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
                 image_Taken.setImageBitmap(bitmap);
                 image_Taken.setRotation(90);
-//                image_Taken.setImageURI(Uri.fromFile(f));
             }
         }
 
@@ -167,7 +166,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
                 image_Taken.setImageBitmap(bitmap);
                 image_Taken.setRotation(90);
-//                image_Taken.setImageURI(data.getData());
             }
         }
 
@@ -278,11 +276,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 TextView nameView = null;
                 Cursor imageData = mDatabaseHelper.getData(category_Name + "_Image", data_ID);
                 imageData.moveToNext();
-//                try {
-                    nameView = createTextViewForItemName(data_ID, data_Name, imageData.getString(1), table_ItemNames);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                nameView = createTextViewForItemName(data_ID, data_Name, imageData.getString(1), table_ItemNames);
                 table_ItemNames.addView(nameView);
 
                 // Instantiate each VersusItem
@@ -317,6 +311,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                 // Push the item to the item list
                 itemList.add(savedItem);
+
+                imageData.close();
             }
         }
 
@@ -402,12 +398,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 // 2. into UI (itemName and itemImg)
                 data.moveToLast();
                 String newId = data.getString(0);
-                TextView newItemTextView = null;
-//                try {
-                    newItemTextView = createTextViewForItemName(newId, "New Item", null, table_ItemNames);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                TextView newItemTextView = createTextViewForItemName(newId, "New Item", null, table_ItemNames);
                 table_ItemNames.addView(newItemTextView);
                 for (int i = 2; i < data.getColumnCount(); i++) {
 
@@ -499,6 +490,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     for (int i = 0; i < itemList.size(); i++) {
                         itemList.get(i).getItemValues().add("New Value");
                     }
+
+                    data.close();
                 } else {
 
                     // If newCategoryName is duplicate, decrement count again
@@ -518,6 +511,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                     newDialog.show();
                 }
+
+                count_Data.close();
 
                 // TODO: REMOVED ==================================================
                 System.out.println("============= item List ==============");
@@ -577,8 +572,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         } else {
 
             // Set imageView with filePath
-//            newItemImageView.setImageURI(Uri.parse(imageURI));
-
             Uri imageUri = Uri.parse(imageURI);
             Bitmap bitmap = null;
             try {
@@ -610,6 +603,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                                 Cursor imageData = mDatabaseHelper.getData(category_Name + "_Image", id);
                                 imageData.moveToNext();
                                 intent.putExtra("imageURI", imageData.getString(1));
+
+                                imageData.close();
 
                                 startActivity(intent);
                                 break;
@@ -784,6 +779,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                             newDialog.show();
                         }
+
+                        database.close();
 
                         // TODO: REMOVED ==================================================
                         System.out.println("============= item List ==============");
@@ -997,6 +994,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                             newDialog.show();
                         }
 
+                        database.close();
+
                         // TODO: REMOVED ==================================================
                         System.out.println("============= item List ==============");
                         for (int i = 0; i < itemList.size(); i++) {
@@ -1047,6 +1046,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         if (database.getColumnCount() <= 3) {
                             ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
                         }
+
+                        database.close();
                     }
                 });
 
@@ -1121,6 +1122,8 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                             // Change on UI
                             newItemValueTextView.setText(newItemValue);
+
+                            data.close();
                         }
 
                         // TODO: REMOVED ==================================================

@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import java.io.File;
 
 public class ItemImageActivity extends AppCompatActivity {
 
