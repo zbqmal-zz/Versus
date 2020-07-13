@@ -168,46 +168,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 image_Taken.setRotation(90);
             }
         }
-
-        // TODO: REMOVED ==================================================
-        System.out.println("============= item List ==============");
-        for (int i = 0; i < itemList.size(); i++) {
-            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-            }
-            System.out.println();
-        }
-        System.out.println("======================================");
-
-        System.out.println("============= Database ===============");
-        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-        while(test_Data2.moveToNext()) {
-            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-            }
-            System.out.println();
-        }
-        System.out.println("======================================");
-        test_Data2.close();
-
-        System.out.println("============= Count Table ===============");
-        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-        test_Data3.moveToNext();
-        System.out.println("Count is " + test_Data3.getString(1));
-        System.out.println("======================================");
-        test_Data3.close();
-
-        System.out.println("============= Image Table ===============");
-        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-        while(test_Data4.moveToNext()) {
-            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-            System.out.println();
-        }
-        System.out.println("======================================");
-        test_Data4.close();
-        // TODO: REMOVED ==================================================
     }
 
     /*
@@ -316,46 +276,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             }
         }
 
-        // TODO: REMOVED ==================================================
-        System.out.println("============= item List ==============");
-        for (int i = 0; i < itemList.size(); i++) {
-            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-            }
-            System.out.println();
-        }
-        System.out.println("======================================");
-
-        System.out.println("============= Database ===============");
-        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-        while(test_Data2.moveToNext()) {
-            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-            }
-            System.out.println();
-        }
-        System.out.println("======================================");
-        test_Data2.close();
-
-        System.out.println("============= Count Table ===============");
-        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-        test_Data3.moveToNext();
-        System.out.println("Count is " + test_Data3.getString(1));
-        System.out.println("======================================");
-        test_Data3.close();
-
-        System.out.println("============= Image Table ===============");
-        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-        while(test_Data4.moveToNext()) {
-            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-            System.out.println();
-        }
-        System.out.println("======================================");
-        test_Data4.close();
-        // TODO: REMOVED ==================================================
-
         data.close();
     }
 
@@ -415,46 +335,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
                 itemList.add(newItem);
 
-                // TODO: REMOVED ==================================================
-                System.out.println("============= item List ==============");
-                for (int i = 0; i < itemList.size(); i++) {
-                    System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                    for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                        System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                    }
-                    System.out.println();
-                }
-                System.out.println("======================================");
-
-                System.out.println("============= Database ===============");
-                Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                while(test_Data2.moveToNext()) {
-                    System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                    for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                        System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                    }
-                    System.out.println();
-                }
-                System.out.println("======================================");
-                test_Data2.close();
-
-                System.out.println("============= Count Table ===============");
-                Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                test_Data3.moveToNext();
-                System.out.println("Count is " + test_Data3.getString(1));
-                System.out.println("======================================");
-                test_Data3.close();
-
-                System.out.println("============= Image Table ===============");
-                Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                while(test_Data4.moveToNext()) {
-                    System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                    System.out.println();
-                }
-                System.out.println("======================================");
-                test_Data4.close();
-                // TODO: REMOVED ==================================================
-
                 data.close();
             }
         });
@@ -513,46 +393,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 }
 
                 count_Data.close();
-
-                // TODO: REMOVED ==================================================
-                System.out.println("============= item List ==============");
-                for (int i = 0; i < itemList.size(); i++) {
-                    System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                    for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                        System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                    }
-                    System.out.println();
-                }
-                System.out.println("======================================");
-
-                System.out.println("============= Database ===============");
-                Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                while(test_Data2.moveToNext()) {
-                    System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                    for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                        System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                    }
-                    System.out.println();
-                }
-                System.out.println("======================================");
-                test_Data2.close();
-
-                System.out.println("============= Count Table ===============");
-                Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                test_Data3.moveToNext();
-                System.out.println("Count is " + test_Data3.getString(1));
-                System.out.println("======================================");
-                test_Data3.close();
-
-                System.out.println("============= Image Table ===============");
-                Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                while(test_Data4.moveToNext()) {
-                    System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                    System.out.println();
-                }
-                System.out.println("======================================");
-                test_Data4.close();
-                // TODO: REMOVED ==================================================
             }
         });
     }
@@ -696,46 +536,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                             // Change on UI
                             newItemTextView.setText(newItemName);
                         }
-
-                        // TODO: REMOVED ==================================================
-                        System.out.println("============= item List ==============");
-                        for (int i = 0; i < itemList.size(); i++) {
-                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-
-                        System.out.println("============= Database ===============");
-                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                        while(test_Data2.moveToNext()) {
-                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data2.close();
-
-                        System.out.println("============= Count Table ===============");
-                        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                        test_Data3.moveToNext();
-                        System.out.println("Count is " + test_Data3.getString(1));
-                        System.out.println("======================================");
-                        test_Data3.close();
-
-                        System.out.println("============= Image Table ===============");
-                        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                        while(test_Data4.moveToNext()) {
-                            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data4.close();
-                        // TODO: REMOVED ==================================================
                     }
                 });
 
@@ -781,46 +581,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         }
 
                         database.close();
-
-                        // TODO: REMOVED ==================================================
-                        System.out.println("============= item List ==============");
-                        for (int i = 0; i < itemList.size(); i++) {
-                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-
-                        System.out.println("============= Database ===============");
-                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                        while(test_Data2.moveToNext()) {
-                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data2.close();
-
-                        System.out.println("============= Count Table ===============");
-                        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                        test_Data3.moveToNext();
-                        System.out.println("Count is " + test_Data3.getString(1));
-                        System.out.println("======================================");
-                        test_Data3.close();
-
-                        System.out.println("============= Image Table ===============");
-                        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                        while(test_Data4.moveToNext()) {
-                            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data4.close();
-                        // TODO: REMOVED ==================================================
                     }
                 });
 
@@ -915,46 +675,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                                 newDialog.show();
                             }
                         }
-
-                        // TODO: REMOVED ==================================================
-                        System.out.println("============= item List ==============");
-                        for (int i = 0; i < itemList.size(); i++) {
-                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-
-                        System.out.println("============= Database ===============");
-                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                        while(test_Data2.moveToNext()) {
-                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data2.close();
-
-                        System.out.println("============= Count Table ===============");
-                        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                        test_Data3.moveToNext();
-                        System.out.println("Count is " + test_Data3.getString(1));
-                        System.out.println("======================================");
-                        test_Data3.close();
-
-                        System.out.println("============= Image Table ===============");
-                        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                        while(test_Data4.moveToNext()) {
-                            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data4.close();
-                        // TODO: REMOVED ==================================================
                     }
                 });
 
@@ -995,46 +715,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         }
 
                         database.close();
-
-                        // TODO: REMOVED ==================================================
-                        System.out.println("============= item List ==============");
-                        for (int i = 0; i < itemList.size(); i++) {
-                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-
-                        System.out.println("============= Database ===============");
-                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                        while(test_Data2.moveToNext()) {
-                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data2.close();
-
-                        System.out.println("============= Count Table ===============");
-                        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                        test_Data3.moveToNext();
-                        System.out.println("Count is " + test_Data3.getString(1));
-                        System.out.println("======================================");
-                        test_Data3.close();
-
-                        System.out.println("============= Image Table ===============");
-                        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                        while(test_Data4.moveToNext()) {
-                            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data4.close();
-                        // TODO: REMOVED ==================================================
                     }
                 });
 
@@ -1125,46 +805,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                             data.close();
                         }
-
-                        // TODO: REMOVED ==================================================
-                        System.out.println("============= item List ==============");
-                        for (int i = 0; i < itemList.size(); i++) {
-                            System.out.print(itemList.get(i).getItemID() + ". " + itemList.get(i).getItemName() + ", ");
-                            for (int j = 0; j < itemList.get(i).getItemValues().size(); j++) {
-                                System.out.print(itemList.get(i).getItemValues().get(j) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-
-                        System.out.println("============= Database ===============");
-                        Cursor test_Data2 = mDatabaseHelper.getData(category_Name);
-                        while(test_Data2.moveToNext()) {
-                            System.out.print(test_Data2.getString(0) + ". " + test_Data2.getString(1) + ", ");
-                            for (int i = 2; i < test_Data2.getColumnCount(); i++) {
-                                System.out.print(test_Data2.getColumnName(i) + ": " + test_Data2.getString(i) + ", ");
-                            }
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data2.close();
-
-                        System.out.println("============= Count Table ===============");
-                        Cursor test_Data3 = mDatabaseHelper.getData(category_Name + "_Count");
-                        test_Data3.moveToNext();
-                        System.out.println("Count is " + test_Data3.getString(1));
-                        System.out.println("======================================");
-                        test_Data3.close();
-
-                        System.out.println("============= Image Table ===============");
-                        Cursor test_Data4 = mDatabaseHelper.getData(category_Name + "_Image");
-                        while(test_Data4.moveToNext()) {
-                            System.out.print(test_Data4.getString(0) + ". " + test_Data4.getBlob(1) + ", ");
-                            System.out.println();
-                        }
-                        System.out.println("======================================");
-                        test_Data4.close();
-                        // TODO: REMOVED ==================================================
                     }
                 });
 
