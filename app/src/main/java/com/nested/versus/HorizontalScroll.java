@@ -1,4 +1,4 @@
-package com.example.versus;
+package com.nested.versus;
 
 import android.content.Context;
 import android.util.AttributeSet;

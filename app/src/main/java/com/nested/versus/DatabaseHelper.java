@@ -1,4 +1,4 @@
-package com.example.versus;
+package com.nested.versus;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -392,11 +392,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /*
     Method for updating image
      */
-    public void updateImage(String table_Name, String id, String imagePath) { /* byte img[] */
+    public void updateImage(String table_Name, String id, String imagePath) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-//        contentValues.put("image", img);
         contentValues.put("image", imagePath);
         db.update("'" + table_Name + "'", contentValues, "ID = ?", new String[] { id });
     }

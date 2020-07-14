@@ -1,6 +1,4 @@
-package com.example.versus;
-
-import java.util.ArrayList;
+package com.nested.versus;
 
 public class VersusCategory {
 
