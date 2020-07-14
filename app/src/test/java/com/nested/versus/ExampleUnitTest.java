@@ -1,4 +1,4 @@
-package com.example.versus;
+package com.nested.versus;
 
 import org.junit.Test;
 
