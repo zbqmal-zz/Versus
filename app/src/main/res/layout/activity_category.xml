@@ -6,34 +6,43 @@
     android:layout_height="match_parent"
     tools:context=".CategoryActivity">
 
-    <ImageView
+    <Button
         android:id="@+id/image_Add_Col"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/ic_add_table"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_width="@dimen/forty_sp"
+        android:layout_height="@dimen/forty_sp"
+        android:background="@drawable/adding_button"
+        android:text="@string/adding_button_plus_sign"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/thirty_sp"
+        android:layout_marginTop="@dimen/ten_sp"
+        android:layout_marginEnd="@dimen/twenty_sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/categoryNameTextView"></ImageView>
+        app:layout_constraintTop_toBottomOf="@+id/categoryNameTextView"/>
 
-    <ImageView
+    <Button
         android:id="@+id/image_Add_Row"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/ic_add_table"
+        android:layout_width="@dimen/forty_sp"
+        android:layout_height="@dimen/forty_sp"
+        android:layout_marginStart="@dimen/twenty_sp"
+        android:layout_marginTop="@dimen/ten_sp"
+        android:text="@string/adding_button_plus_sign"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/thirty_sp"
+        android:background="@drawable/adding_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout4">
-
-    </ImageView>
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout4"
+        tools:ignore="ContentDescription"/>
 
     <TextView
         android:id="@+id/categoryNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/twenty_sp"
+        android:fontFamily="@font/convergence"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/thirty_sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,10 +52,10 @@
         android:id="@+id/relativeLayout4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="80dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginStart="@dimen/eight_sp"
+        android:layout_marginEnd="@dimen/eight_sp"
+        android:layout_marginBottom="@dimen/eighty_sp"
+        android:layout_marginTop="@dimen/hundred_sp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,26 +64,26 @@
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/hundred_sp"
+            android:layout_height="@dimen/hundred_sp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp">
+            android:layout_marginStart="@dimen/ten_sp"
+            android:layout_marginTop="@dimen/twenty_sp">
 
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/relativeLayout2"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="@dimen/hundred_sp"
             android:layout_alignTop="@+id/relativeLayout"
             android:layout_alignBottom="@+id/relativeLayout"
             android:layout_alignParentEnd="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginStart="@dimen/zero_sp"
+            android:layout_marginTop="@dimen/zero_sp"
+            android:layout_marginEnd="@dimen/ten_sp"
+            android:layout_marginBottom="@dimen/zero_sp"
             android:layout_toEndOf="@+id/relativeLayout">
 
             <com.nested.versus.HorizontalScroll
@@ -85,8 +94,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="40dp">
+                android:layout_marginTop="@dimen/zero_sp"
+                android:layout_marginBottom="@dimen/forty_sp">
 
                 <TableRow
                     android:id="@+id/table_images"
@@ -106,11 +115,11 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="60dp"
-                android:layout_marginEnd="0dp"
-                android:layout_marginBottom="0dp"
-                android:padding="0dp">
+                android:layout_marginStart="@dimen/zero_sp"
+                android:layout_marginTop="@dimen/sixty_sp"
+                android:layout_marginEnd="@dimen/zero_sp"
+                android:layout_marginBottom="@dimen/zero_sp"
+                android:padding="@dimen/zero_sp">
 
                 <TableRow
                     android:id="@+id/table_col"
@@ -124,16 +133,16 @@
 
         <RelativeLayout
             android:id="@+id/relativeLayout3"
-            android:layout_width="100dp"
+            android:layout_width="@dimen/hundred_sp"
             android:layout_height="match_parent"
             android:layout_below="@+id/relativeLayout"
             android:layout_alignStart="@+id/relativeLayout"
             android:layout_alignEnd="@+id/relativeLayout"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="30dp">
+            android:layout_marginStart="@dimen/zero_sp"
+            android:layout_marginTop="@dimen/zero_sp"
+            android:layout_marginEnd="@dimen/zero_sp"
+            android:layout_marginBottom="@dimen/thirty_sp">
 
             <com.nested.versus.VerticalScroll
                 android:id="@+id/itemCategory_Vertical"
@@ -143,10 +152,10 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:layout_marginEnd="0dp"
-                android:layout_marginBottom="0dp">
+                android:layout_marginStart="@dimen/zero_sp"
+                android:layout_marginTop="@dimen/zero_sp"
+                android:layout_marginEnd="@dimen/zero_sp"
+                android:layout_marginBottom="@dimen/zero_sp">
 
                 <TableLayout
                     android:id="@+id/table_row"
@@ -158,15 +167,15 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_width="274dp"
-            android:layout_height="417dp"
+            android:layout_width="@dimen/two_seven_four_sp"
+            android:layout_height="@dimen/four_one_seven_sp"
             android:layout_below="@+id/relativeLayout2"
             android:layout_alignEnd="@+id/relativeLayout2"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginStart="@dimen/zero_sp"
+            android:layout_marginTop="@dimen/zero_sp"
+            android:layout_marginEnd="@dimen/zero_sp"
+            android:layout_marginBottom="@dimen/thirty_sp"
             android:layout_toEndOf="@+id/relativeLayout3"
             android:orientation="horizontal">
 
@@ -179,13 +188,13 @@
                     android:id="@+id/itemValue_Vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="0dp">
+                    android:padding="@dimen/zero_sp">
 
                     <TableLayout
                         android:id="@+id/table_items"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#f1f1f1"></TableLayout>
+                        android:background="@color/f1f1f1"></TableLayout>
                 </com.nested.versus.VerticalScroll>
             </com.nested.versus.HorizontalScroll>
 

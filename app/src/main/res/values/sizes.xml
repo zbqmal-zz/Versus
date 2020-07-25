@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="zero_sp">0sp</dimen>
+    <dimen name="one_sp">1sp</dimen>
+    <dimen name="two_sp">2sp</dimen>
+    <dimen name="five_sp">5sp</dimen>
+    <dimen name="eight_sp">8sp</dimen>
+    <dimen name="ten_sp">10sp</dimen>
+    <dimen name="sixteen_sp">16sp</dimen>
+    <dimen name="twenty_sp">20sp</dimen>
+    <dimen name="twenty_five_sp">25sp</dimen>
+    <dimen name="thirty_sp">30sp</dimen>
+    <dimen name="thirty_five_sp">35sp</dimen>
+    <dimen name="forty_sp">40sp</dimen>
+    <dimen name="fifty_sp">50sp</dimen>
+    <dimen name="fifty_five_sp">55sp</dimen>
+    <dimen name="sixty_sp">60sp</dimen>
+    <dimen name="sixty_five_sp">65sp</dimen>
+    <dimen name="eighty_sp">80sp</dimen>
+    <dimen name="hundred_sp">100sp</dimen>
+    <dimen name="one_fifty_sp">150sp</dimen>
+    <dimen name="one_six_eight_sp">168sp</dimen>
+    <dimen name="two_seven_four_sp">274sp</dimen>
+    <dimen name="three_hundreds_sp">300sp</dimen>
+    <dimen name="three_five_five_sp">355sp</dimen>
+    <dimen name="four_one_seven_sp">417sp</dimen>
+    <dimen name="five_hundreds_sp">500sp</dimen>
+</resources>

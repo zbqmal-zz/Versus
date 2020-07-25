@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Versus</string>
+    <string name="app_name">WOB</string>
+    <string name="welcome_text">Which\nOne\'s\nBest?</string>
+    <string name="main_title">My WOB</string>
+    <string name="adding_button_plus_sign">+</string>
+
+    <string name="Line1">Line 1</string>
+
 </resources>

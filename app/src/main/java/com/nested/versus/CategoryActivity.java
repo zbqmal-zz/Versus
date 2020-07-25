@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
 
 import android.Manifest;
 import android.app.Activity;
@@ -23,12 +24,19 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.shape.ShapeAppearanceModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,9 +60,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     private String category_Name,
                    currentPhotoPath,
                    currentPhotoID;
-    private ImageView btn_AddItem,
-                      btn_AddCategory,
-                      image_Taken;
+    private Button btn_AddItem,
+                btn_AddCategory;
+    private ImageView image_Taken;
     private TableLayout table_Categories,
                         table_Items;
     private TableRow table_ItemNames,
@@ -248,6 +256,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     // Place item categories first if it's first time to add
                     if (data.getPosition() == 0) {
                         TableRow categoryView = createTableRowForItemCategory(data_Category, table_Categories);
+                        if (i % 2 == 1) {
+                            //color categoryView
+                        }
                         table_Categories.addView(categoryView);
                     }
 
@@ -262,7 +273,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         // For ItemValues (Not first items)
                         TableRow currentRow = (TableRow) table_Items.getChildAt(i - 2);
                         TextView newValueTextView = createTextViewForItemValue(data_ID, data_Value, data_Category, i - 2, currentRow);
-                        currentRow.addView(newValueTextView);
+
+                        android.widget.TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                        layoutParams.setMargins(10,0,10,0);
+
+                        currentRow.addView(newValueTextView, layoutParams);
                     }
 
                     // Update the VersusItem
@@ -404,6 +419,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
         // ItemImage ImageView
         final TextView newItemTextView = new TextView(CategoryActivity.this);
+        final float radius = getResources().getDimension(R.dimen.five_sp);
+        final ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel().toBuilder().setAllCorners(CornerFamily.ROUNDED, radius).build();
+        final MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeAppearanceModel);
         final ImageView newItemImageView = new ImageView(CategoryActivity.this);
         newItemImageView.setForegroundGravity(Gravity.CENTER);
 
@@ -482,8 +500,14 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         // ItemName TextView
         newItemTextView.setText(itemName);
         newItemTextView.setGravity(Gravity.CENTER);
+        newItemTextView.setTextColor(getResources().getColor(R.color.colorBlack));
         newItemTextView.setWidth(300);
         newItemTextView.setHeight(100);
+        shapeDrawable.setFillColor(ContextCompat.getColorStateList(this, R.color.colorGray));
+        shapeDrawable.setStroke(1.5f, ContextCompat.getColor(this, R.color.colorGray));
+        ViewCompat.setBackground(newItemTextView, shapeDrawable);
+
+        //ItemName Editing Event
         newItemTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
