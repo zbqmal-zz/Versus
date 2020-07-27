@@ -165,7 +165,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     e.printStackTrace();
                 }
                 image_Taken.setImageBitmap(bitmap);
-                image_Taken.setRotation(90);
             }
         }
     }
@@ -420,7 +419,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 e.printStackTrace();
             }
             newItemImageView.setImageBitmap(bitmap);
-            newItemImageView.setRotation(90);
         }
         newItemImageView.setOnClickListener(new View.OnClickListener() {
             @Override
