@@ -245,7 +245,11 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 Cursor imageData = mDatabaseHelper.getData(category_Name + "_Image", data_ID);
                 imageData.moveToNext();
                 nameView = createTextViewForItemName(data_ID, data_Name, imageData.getString(1), table_ItemNames);
-                table_ItemNames.addView(nameView);
+
+                android.widget.TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(10,10,10,10);
+
+                table_ItemNames.addView(nameView, layoutParams);
 
                 // Instantiate each VersusItem
                 VersusItem savedItem = new VersusItem(data_ID, data_Name);
@@ -256,9 +260,6 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     // Place item categories first if it's first time to add
                     if (data.getPosition() == 0) {
                         TableRow categoryView = createTableRowForItemCategory(data_Category, table_Categories);
-                        if (i % 2 == 1) {
-                            //color categoryView
-                        }
                         table_Categories.addView(categoryView);
                     }
 
@@ -267,15 +268,12 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         // Create and add new TableRow into table_ItemValues, and Place each itemValue into the tableRow
                         TableRow newTableRow = new TableRow(CategoryActivity.this);
                         TextView valueTextView = createTextViewForItemValue(data_ID, data_Value, data_Category, i - 2, newTableRow);
-                        newTableRow.addView(valueTextView);
+                        newTableRow.addView(valueTextView, layoutParams);
                         table_Items.addView(newTableRow);
                     } else {
                         // For ItemValues (Not first items)
                         TableRow currentRow = (TableRow) table_Items.getChildAt(i - 2);
                         TextView newValueTextView = createTextViewForItemValue(data_ID, data_Value, data_Category, i - 2, currentRow);
-
-                        android.widget.TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(10,0,10,0);
 
                         currentRow.addView(newValueTextView, layoutParams);
                     }
@@ -316,11 +314,15 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         table_ItemNames = findViewById(R.id.table_col);
         table_ItemImages = findViewById(R.id.table_images);
     }
-
+    
     /*
     Function for setting up buttons' on click listeners
      */
     private void setButtons() {
+
+        final android.widget.TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(10,10,10,10);
+
         btn_AddItem = findViewById(R.id.image_Add_Col);
         btn_AddItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -334,13 +336,13 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 data.moveToLast();
                 String newId = data.getString(0);
                 TextView newItemTextView = createTextViewForItemName(newId, "New Item", null, table_ItemNames);
-                table_ItemNames.addView(newItemTextView);
+                table_ItemNames.addView(newItemTextView, layoutParams);
                 for (int i = 2; i < data.getColumnCount(); i++) {
 
                     // Add a cell on each row
                     TableRow currTableRow = (TableRow) table_Items.getChildAt(i - 2);
                     TextView newValueTextView = createTextViewForItemValue(newId, "New Value", data.getColumnName(i), i - 2, currTableRow);
-                    currTableRow.addView(newValueTextView);
+                    currTableRow.addView(newValueTextView, layoutParams);
                 }
 
                 // 3. into itemList
@@ -377,9 +379,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     newValueTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                     for (int i = 0; i < itemList.size(); i++) {
                         TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 2, newValueTableRow);
-                        newValueTableRow.addView(newValueTextView);
+                        newValueTableRow.addView(newValueTextView, layoutParams);
                     }
-                    table_Items.addView(newValueTableRow, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                    table_Items.addView(newValueTableRow);
 
                     // 3. into itemList
                     for (int i = 0; i < itemList.size(); i++) {
@@ -503,6 +505,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         newItemTextView.setTextColor(getResources().getColor(R.color.colorBlack));
         newItemTextView.setWidth(300);
         newItemTextView.setHeight(100);
+
         shapeDrawable.setFillColor(ContextCompat.getColorStateList(this, R.color.colorGray));
         shapeDrawable.setStroke(1.5f, ContextCompat.getColor(this, R.color.colorGray));
         ViewCompat.setBackground(newItemTextView, shapeDrawable);
@@ -638,6 +641,17 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         newTextView.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         newTextView.setHeight(100);
         newTextView.setText(categoryName);
+
+        android.widget.TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(10,10,10,10);
+
+        final float radius = getResources().getDimension(R.dimen.five_sp);
+        final ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel().toBuilder().setAllCorners(CornerFamily.ROUNDED, radius).build();
+        final MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeAppearanceModel);
+        shapeDrawable.setFillColor(ContextCompat.getColorStateList(this, R.color.colorGray));
+        shapeDrawable.setStroke(1.5f, ContextCompat.getColor(this, R.color.colorGray));
+        ViewCompat.setBackground(newTextView, shapeDrawable);
+
         newTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -759,7 +773,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             }
         });
 
-        newTableRow.addView(newTextView);
+        newTableRow.addView(newTextView, layoutParams);
 
         return newTableRow;
     }
