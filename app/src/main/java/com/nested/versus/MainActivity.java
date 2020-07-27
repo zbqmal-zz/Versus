@@ -24,16 +24,14 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper mDatabaseHelper;
 
     private ArrayList<VersusCategory> categoryList;
-
     private RecyclerView itemRecyclerView;
     private CategoryAdapter categoryAdapter;
     private RecyclerView.LayoutManager itemLayoutManager;
+    private Button buttonAdd;
 
     TextView categoryTextView;
     AlertDialog dialog;
     EditText categoryEditText;
-
-    private Button buttonAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setButtons() {
         buttonAdd = findViewById(R.id.btn_ADD);
-
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

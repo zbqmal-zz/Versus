@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TYPE_NAME = "name";
 
     private static final String ITEM_NAME = "name";
-    private static final String ITEM_CATEGORY = "New_Category";
+    private static final String ITEM_CATEGORY = "Category";
     private static final String CATEGORY_COUNT = "Count";
 
     public DatabaseHelper(Context context) { super(context, TABLE_NAME_TYPE, null, 1); }
