@@ -2,6 +2,7 @@ package com.nested.versus;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,18 +18,21 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -40,6 +44,7 @@ import com.google.android.material.shape.ShapeAppearanceModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +65,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     private String category_Name,
                    currentPhotoPath,
                    currentPhotoID;
+    private int image_Taken_ID;
     private Button btn_AddItem,
                 btn_AddCategory;
     private ImageView image_Taken;
@@ -80,6 +86,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,8 +119,14 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         setButtons();
 
         // Set up imageView for itemImage will be taken
-        image_Taken = null;
-        currentPhotoID = "1";
+        if (savedInstanceState != null) {
+            currentPhotoPath = savedInstanceState.getString("Current_Photo_Path");
+            currentPhotoID = savedInstanceState.getString("Current_Photo_ID");
+        } else {
+            image_Taken = null;
+            currentPhotoID = "1";
+            image_Taken_ID = -1;
+        }
 
         // Load or initialize itemList and Place all items in the UI
         layoutParams_ForItems = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
@@ -121,9 +134,24 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         init_ItemList(intent.getStringExtra("category_Name"));
     }
 
+    @Override
+    public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        currentPhotoPath = savedInstanceState.getString("Current_Photo_Path");
+        currentPhotoID = savedInstanceState.getString("Current_Photo_ID");
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        savedInstanceState.putString("Current_Photo_Path", currentPhotoPath);
+        savedInstanceState.putString("Current_Photo_ID", currentPhotoID);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     /*
-    Method for saving image data into DB and set the UI
-     */
+                Method for saving image data into DB and set the UI
+                 */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,8 +187,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                bitmap = rotateBitmap(bitmap, f);
                 image_Taken.setImageBitmap(bitmap);
-                image_Taken.setRotation(90);
+//                image_Taken.setRotation(90);
             }
         }
 
@@ -223,6 +252,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     /*
     Function for initializing item list and placing them onto UI
      */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void init_ItemList(final String category_Name) {
 
         itemList = new ArrayList<>();
@@ -260,7 +290,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                     // Place item categories first if it's first time to add
                     if (data.getPosition() == 0) {
-                        TableRow categoryView = createTableRowForItemCategory(data_Category, table_Categories);
+                        TableRow categoryView = createTableRowForItemCategory(data_Category);
                         table_Categories.addView(categoryView);
                     }
 
@@ -268,13 +298,13 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                         // For ItemValues
                         // Create and add new TableRow into table_ItemValues, and Place each itemValue into the tableRow
                         TableRow newTableRow = new TableRow(CategoryActivity.this);
-                        TextView valueTextView = createTextViewForItemValue(data_ID, data_Value, data_Category, i - 2, newTableRow);
+                        TextView valueTextView = createTextViewForItemValue(data_ID, data_Value, newTableRow);
                         newTableRow.addView(valueTextView, layoutParams_ForItems);
                         table_Items.addView(newTableRow);
                     } else {
                         // For ItemValues (Not first items)
                         TableRow currentRow = (TableRow) table_Items.getChildAt(i - 2);
-                        TextView newValueTextView = createTextViewForItemValue(data_ID, data_Value, data_Category, i - 2, currentRow);
+                        TextView newValueTextView = createTextViewForItemValue(data_ID, data_Value, currentRow);
 
                         currentRow.addView(newValueTextView, layoutParams_ForItems);
                     }
@@ -323,6 +353,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
         btn_AddItem = findViewById(R.id.image_Add_Col);
         btn_AddItem.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View v) {
                 // 1. into DB (itemName and itemImg)
@@ -339,7 +370,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
 
                     // Add a cell on each row
                     TableRow currTableRow = (TableRow) table_Items.getChildAt(i - 2);
-                    TextView newValueTextView = createTextViewForItemValue(newId, "New Value", data.getColumnName(i), i - 2, currTableRow);
+                    TextView newValueTextView = createTextViewForItemValue(newId, "New Value", currTableRow);
                     currTableRow.addView(newValueTextView, layoutParams_ForItems);
                 }
 
@@ -369,14 +400,14 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                     // New Category
                     Cursor data = mDatabaseHelper.getData(category_Name);
                     data.moveToFirst();
-                    TableRow newTableRow = createTableRowForItemCategory(newCategoryName, table_Categories);
+                    TableRow newTableRow = createTableRowForItemCategory(newCategoryName);
                     table_Categories.addView(newTableRow, layoutParams_ForItems);
 
                     // New Values
                     TableRow newValueTableRow = new TableRow(CategoryActivity.this);
                     newValueTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                     for (int i = 0; i < itemList.size(); i++) {
-                        TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", data.getColumnName(data.getColumnCount() - 1), data.getColumnCount() - 2, newValueTableRow);
+                        TextView newValueTextView = createTextViewForItemValue(itemList.get(i).getItemID(), "New Value", newValueTableRow);
                         newValueTableRow.addView(newValueTextView, layoutParams_ForItems);
                     }
                     table_Items.addView(newValueTableRow);
@@ -415,11 +446,12 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     /*
     Function for creating TextView for item name
      */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private TextView createTextViewForItemName(final String id, String itemName, final String imageURI, final TableRow tableRow) {
 
         // ItemImage ImageView
         final TextView newItemTextView = new TextView(CategoryActivity.this);
-        final float radius = getResources().getDimension(R.dimen.five_sp);
+        final float radius = getResources().getDimension(R.dimen.five_dp);
         final ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel().toBuilder().setAllCorners(CornerFamily.ROUNDED, radius).build();
         final MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeAppearanceModel);
         final ImageView newItemImageView = new ImageView(CategoryActivity.this);
@@ -434,6 +466,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(CategoryActivity.this.getContentResolver(), imageUri);
+                bitmap = rotateBitmap(bitmap, new File(imageUri.getPath()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -471,6 +504,9 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
                                 // Ask camera permission
                                 if (ContextCompat.checkSelfPermission(CategoryActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                                     ActivityCompat.requestPermissions(CategoryActivity.this, new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+                                    if (ContextCompat.checkSelfPermission(CategoryActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                        dispatchTakePictureIntent();
+                                    }
                                 } else {
                                     dispatchTakePictureIntent();
                                 }
@@ -500,6 +536,7 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         newItemTextView.setText(itemName);
         newItemTextView.setGravity(Gravity.CENTER);
         newItemTextView.setTextColor(getResources().getColor(R.color.colorBlack));
+        newItemTextView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
         newItemTextView.setWidth(300);
         newItemTextView.setHeight(100);
 
@@ -629,18 +666,19 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     /*
     Function for creating TableRow for item category
      */
-    private TableRow createTableRowForItemCategory(final String categoryName, final TableLayout tableLayout) {
+    private TableRow createTableRowForItemCategory(final String categoryName) {
 
         final TableRow newTableRow = new TableRow(CategoryActivity.this);
         newTableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         final TextView newTextView = new TextView(CategoryActivity.this);
         newTextView.setGravity(Gravity.CENTER);
         newTextView.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        newTextView.setHeight(100);
-        newTextView.setWidth(200);
         newTextView.setText(categoryName);
+        newTextView.setHeight(100);
+        newTextView.setWidth(150);
+        newTextView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
 
-        final float radius = getResources().getDimension(R.dimen.five_sp);
+        final float radius = getResources().getDimension(R.dimen.five_dp);
         final ShapeAppearanceModel shapeAppearanceModel = new ShapeAppearanceModel().toBuilder().setAllCorners(CornerFamily.ROUNDED, radius).build();
         final MaterialShapeDrawable shapeDrawable = new MaterialShapeDrawable(shapeAppearanceModel);
         shapeDrawable.setFillColor(ContextCompat.getColorStateList(this, R.color.colorGray));
@@ -802,13 +840,14 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
     /*
     Method for creating TextView for item Values
      */
-    private TextView createTextViewForItemValue(final String id, final String itemValue, final String category, final int category_Index, final TableRow tableRow) {
+    private TextView createTextViewForItemValue(final String id, final String itemValue, final TableRow tableRow) {
         final TextView newItemValueTextView = new TextView(CategoryActivity.this);
         newItemValueTextView.setGravity(Gravity.CENTER);
-        newItemValueTextView.setWidth(300);
-        newItemValueTextView.setHeight(100);
         newItemValueTextView.setBackgroundColor(Color.parseColor("#FFFFFF"));
         newItemValueTextView.setText(itemValue);
+        newItemValueTextView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()));
+        newItemValueTextView.setWidth(1000);
+        newItemValueTextView.setHeight(100);
         newItemValueTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -933,19 +972,68 @@ public class CategoryActivity extends AppCompatActivity implements HorizontalScr
         return byteBuffer.toByteArray();
     }
 
-//    private String getRealPathFromURI(Uri contentURI) {
-//        String result;
-//        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-//        if (cursor == null) { // Source is Dropbox or other similar local file path
-//            result = contentURI.getPath();
-//        } else {
-//            cursor.moveToFirst();
-//            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-//            result = cursor.getString(idx);
-//            cursor.close();
-//        }
-//        return result;
-//    }
+    /*
+    Method for rotating a bitmap image with correct orientation
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private Bitmap rotateBitmap(Bitmap imageBitmap, File imageFile) {
+
+        // Get correct image's orientation
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(new FileInputStream(imageFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        if (exif != null) {
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+            // Rotate Bitmap depending orientation
+            Matrix matrix = new Matrix();
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_NORMAL:
+                    return imageBitmap;
+                case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                    matrix.setScale(-1, 1);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    matrix.setRotate(180);
+                    break;
+                case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                    matrix.setRotate(180);
+                    matrix.postScale(-1, 1);
+                    break;
+                case ExifInterface.ORIENTATION_TRANSPOSE:
+                    matrix.setRotate(90);
+                    matrix.postScale(-1, 1);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    matrix.setRotate(90);
+                    break;
+                case ExifInterface.ORIENTATION_TRANSVERSE:
+                    matrix.setRotate(-90);
+                    matrix.postScale(-1, 1);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    matrix.setRotate(-90);
+                    break;
+                default:
+                    return imageBitmap;
+            }
+            try {
+                Bitmap bitmap_Rotated = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true);
+                imageBitmap.recycle();
+                return bitmap_Rotated;
+            } catch (OutOfMemoryError e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return imageBitmap;
+        }
+    }
 }
 
 /* TO CHECK DB AND ITEMLIST

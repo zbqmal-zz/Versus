@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 // Dialog for typing new name for the category
                 AlertDialog dialog = new MaterialAlertDialogBuilder(new ContextThemeWrapper(MainActivity.this, R.style.DialogTheme)).create();
                 final EditText categoryEditText = new EditText(MainActivity.this);
-                categoryEditText.setHint(categoryList.get(position).getCategoryName());
+                categoryEditText.setText(categoryList.get(position).getCategoryName());
 
                 dialog.setTitle("Edit Category Name: \n");
                 dialog.setView(categoryEditText);
